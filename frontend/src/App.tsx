@@ -1,0 +1,61 @@
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import Layout from './components/Layout/Layout';
+import PrivateRoute from './components/PrivateRoute';
+import AdminRoute from './components/AdminRoute';
+
+// Pages
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
+import AdminDashboard from './pages/AdminDashboard';
+import UsersPage from './pages/UsersPage';
+import UserDetailsPage from './pages/UserDetailsPage';
+import PostsPage from './pages/PostsPage';
+import PostDetailsPage from './pages/PostDetailsPage';
+
+function App() {
+  return (
+    <AuthProvider>
+      <div className="App">
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Layout />}>
+            <Route index element={<HomePage />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route path="register" element={<RegisterPage />} />
+            <Route path="posts" element={<PostsPage />} />
+            <Route path="posts/:id" element={<PostDetailsPage />} />
+            
+            {/* Private routes */}
+            <Route element={<PrivateRoute />}>
+              <Route path="profile" element={<ProfilePage />} />
+            </Route>
+            
+            {/* Admin routes */}
+            <Route element={<AdminRoute />}>
+              <Route path="admin" element={<AdminDashboard />} />
+              <Route path="admin/users" element={<UsersPage />} />
+              <Route path="admin/users/:id" element={<UserDetailsPage />} />
+            </Route>
+          </Route>
+          
+          {/* 404 page */}
+          <Route path="*" element={
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="text-center">
+                <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
+                <p className="text-gray-600">Stranica nije pronađena</p>
+              </div>
+            </div>
+          } />
+        </Routes>
+      </div>
+    </AuthProvider>
+  );
+}
+
+export default App; 
+ 
