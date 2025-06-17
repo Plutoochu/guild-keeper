@@ -5,10 +5,10 @@ import axios from 'axios';
 interface User {
   _id: string;
   ime: string;
-  prezime: string;
+  prezime?: string;
   email: string;
   datumRodjenja: string;
-  spol: 'muški' | 'ženski' | 'ostalo';
+  spol?: 'muški' | 'ženski' | 'ostalo';
   tip: 'admin' | 'user';
   profilnaSlika?: string;
   createdAt: string;
@@ -29,11 +29,11 @@ interface AuthContextType {
 
 interface RegisterData {
   ime: string;
-  prezime: string;
+  prezime?: string | null;
   email: string;
   password: string;
   datumRodjenja: string;
-  spol: 'muški' | 'ženski' | 'ostalo';
+  spol?: 'muški' | 'ženski' | 'ostalo' | null;
 }
 
 interface AuthProviderProps {

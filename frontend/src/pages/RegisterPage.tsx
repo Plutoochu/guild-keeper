@@ -72,12 +72,12 @@ const RegisterPage = () => {
     try {
       const registerData = {
         ime: data.ime,
-        prezime: data.prezime || '',
+        prezime: data.prezime || null,
         email: data.email,
         password: data.password,
         confirmPassword: data.confirmPassword,
         datumRodjenja: data.datumRodjenja,
-        spol: (data.spol || 'ostalo') as 'muški' | 'ženski' | 'ostalo'
+        spol: data.spol || null
       };
       await registerUser(registerData);
       toast.success('Uspješno ste se registrovali!');
