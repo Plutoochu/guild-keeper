@@ -3,11 +3,11 @@ import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
   ime: string;
-  prezime: string;
+  prezime?: string;
   email: string;
   password: string;
   datumRodjenja: Date;
-  spol: 'muški' | 'ženski' | 'ostalo';
+  spol?: 'muški' | 'ženski' | 'ostalo';
   tip: 'admin' | 'user';
   slika?: string;
   createdAt: Date;
@@ -24,7 +24,7 @@ const UserSchema = new Schema<IUser>({
   },
   prezime: {
     type: String,
-    required: [true, 'Prezime je obavezno'],
+    required: false,
     trim: true,
     maxlength: [50, 'Prezime ne može biti duže od 50 karaktera']
   },
@@ -47,7 +47,7 @@ const UserSchema = new Schema<IUser>({
   },
   spol: {
     type: String,
-    required: [true, 'Spol je obavezan'],
+    required: false,
     enum: {
       values: ['muški', 'ženski', 'ostalo'],
       message: 'Spol mora biti: muški, ženski ili ostalo'
