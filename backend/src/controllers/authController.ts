@@ -200,6 +200,106 @@ export const registerValidation = [
     .withMessage('Spol mora biti: muški, ženski ili ostalo')
 ];
 
+export const updateProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({
+        success: false,
+        message: 'Validacijska greška',
+        errors: errors.array()
+      });
+      return;
+    }
+
+    const { ime, prezime, email, datumRodjenja, spol } = req.body;
+
+    if (email) {
+      const existingUser = await User.findOne({ 
+        email, 
+        _id: { $ne: req.user?.id } 
+      });
+      if (existingUser) {
+        res.status(400).json({
+          success: false,
+          message: 'Korisnik sa ovom email adresom već postoji'
+        });
+        return;
+      }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user?.id,
+      {
+        ...(ime && { ime }),
+        ...(prezime !== undefined && { prezime }),
+        ...(email && { email }),
+        ...(datumRodjenja && { datumRodjenja }),
+        ...(spol !== undefined && { spol })
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      res.status(404).json({
+        success: false,
+        message: 'Korisnik nije pronađen'
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      message: 'Profil uspješno ažuriran',
+      user: {
+        _id: updatedUser._id,
+        ime: updatedUser.ime,
+        prezime: updatedUser.prezime,
+        email: updatedUser.email,
+        datumRodjenja: updatedUser.datumRodjenja,
+        spol: updatedUser.spol,
+        tip: updatedUser.tip,
+        slika: updatedUser.slika,
+        createdAt: updatedUser.createdAt,
+        updatedAt: updatedUser.updatedAt
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Greška pri ažuriranju profila',
+      error: error.message
+    });
+  }
+};
+
+export const updateProfileValidation = [
+  body('ime')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('Ime mora imati između 2 i 50 karaktera'),
+  body('prezime')
+    .optional({ checkFalsy: true })
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('Prezime mora imati između 2 i 50 karaktera'),
+  body('email')
+    .optional()
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Neispravna email adresa'),
+  body('datumRodjenja')
+    .optional()
+    .isISO8601()
+    .toDate()
+    .withMessage('Neispravni datum rođenja'),
+  body('spol')
+    .optional({ checkFalsy: true })
+    .isIn(['muški', 'ženski', 'ostalo'])
+    .withMessage('Spol mora biti: muški, ženski ili ostalo')
+];
+
 export const loginValidation = [
   body('email')
     .isEmail()

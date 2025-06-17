@@ -17,7 +17,7 @@ const HomePage = () => {
             Dobrodošli u GuildKeeper
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Vaš alat za upravljanje avanturskim guildama i članovima
+            Vaš alat za upravljanje herojima i avanturama
           </p>
           
           <div className="flex justify-center gap-4">
@@ -39,9 +39,9 @@ const HomePage = () => {
         <div className="grid md:grid-cols-3 gap-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
             <User className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Upravljanje članovima</h3>
+            <h3 className="text-lg font-semibold mb-2">Upravljanje herojima</h3>
             <p className="text-gray-600">
-              Organizirajte svoje avanturere i pratite njihove aktivnosti
+              Organizirajte svoje članove i pratite njihove aktivnosti
             </p>
           </div>
           
@@ -49,7 +49,7 @@ const HomePage = () => {
             <BookOpen className="h-12 w-12 text-blue-600 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Kampanje & Avanture</h3>
             <p className="text-gray-600">
-              Kreirajte i upravljajte epskim avanturama za vašu guildu
+              Kreirajte i upravljajte epskim avanturama za vaš guild
             </p>
           </div>
           
@@ -57,7 +57,7 @@ const HomePage = () => {
             <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Admin kontrole</h3>
             <p className="text-gray-600">
-              Potpuna kontrola nad guildom za guild mastera
+              Potpuna kontrola nad guildom za Dungeon Mastera
             </p>
           </div>
         </div>
