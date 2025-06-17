@@ -1,25 +1,11 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import Navbar from '../Navbar';
 
 const Layout = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white shadow border-b">
-        <div className="container mx-auto px-6">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold">
-                GuildKeeper
-              </h1>
-            </div>
-            <nav className="flex items-center gap-6">
-              <a href="/" className="hover:text-blue-600">Početna</a>
-              <a href="/login" className="hover:text-blue-600">Prijava</a>
-              <a href="/register" className="hover:text-blue-600">Registracija</a>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navbar />
       
       <main className="flex-1">
         <Outlet />

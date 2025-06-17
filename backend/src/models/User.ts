@@ -49,7 +49,7 @@ const UserSchema = new Schema<IUser>({
     type: String,
     required: false,
     enum: {
-      values: ['muški', 'ženski', 'ostalo'],
+      values: ['muški', 'ženski', 'ostalo', ''],
       message: 'Spol mora biti: muški, ženski ili ostalo'
     }
   },

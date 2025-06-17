@@ -179,7 +179,7 @@ export const registerValidation = [
     .isLength({ min: 2, max: 50 })
     .withMessage('Ime mora imati između 2 i 50 karaktera'),
   body('prezime')
-    .optional()
+    .optional({ checkFalsy: true })
     .trim()
     .isLength({ min: 2, max: 50 })
     .withMessage('Prezime mora imati između 2 i 50 karaktera'),
@@ -195,7 +195,7 @@ export const registerValidation = [
     .toDate()
     .withMessage('Neispravni datum rođenja'),
   body('spol')
-    .optional()
+    .optional({ checkFalsy: true })
     .isIn(['muški', 'ženski', 'ostalo'])
     .withMessage('Spol mora biti: muški, ženski ili ostalo')
 ];
