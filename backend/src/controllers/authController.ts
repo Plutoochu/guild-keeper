@@ -1,0 +1,209 @@
+import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import User from '../models/User';
+import { body, validationResult } from 'express-validator';
+
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    tip: string;
+  };
+}
+
+const generateToken = (userId: string): string => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET || 'default-secret');
+};
+
+export const register = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({
+        success: false,
+        message: 'Validacijska greška',
+        errors: errors.array()
+      });
+      return;
+    }
+
+    const { ime, prezime, email, password, datumRodjenja, spol } = req.body;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      res.status(400).json({
+        success: false,
+        message: 'Korisnik sa ovom email adresom već postoji'
+      });
+      return;
+    }
+
+    const user = new User({
+      ime,
+      prezime,
+      email,
+      password,
+      datumRodjenja,
+      spol,
+      tip: 'user'
+    });
+
+    await user.save();
+
+    const token = generateToken((user._id as any).toString());
+
+    res.status(201).json({
+      success: true,
+      message: 'Korisnik uspješno registrovan',
+      token,
+      user: {
+        _id: user._id,
+        ime: user.ime,
+        prezime: user.prezime,
+        email: user.email,
+        datumRodjenja: user.datumRodjenja,
+        spol: user.spol,
+        tip: user.tip,
+        slika: user.slika,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Greška pri registraciji',
+      error: error.message
+    });
+  }
+};
+
+export const login = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({
+        success: false,
+        message: 'Validacijska greška',
+        errors: errors.array()
+      });
+      return;
+    }
+
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      res.status(401).json({
+        success: false,
+        message: 'Neispravni podaci za prijavu'
+      });
+      return;
+    }
+
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      res.status(401).json({
+        success: false,
+        message: 'Neispravni podaci za prijavu'
+      });
+      return;
+    }
+
+    const token = generateToken((user._id as any).toString());
+
+    res.json({
+      success: true,
+      message: 'Uspješna prijava',
+      token,
+      user: {
+        _id: user._id,
+        ime: user.ime,
+        prezime: user.prezime,
+        email: user.email,
+        datumRodjenja: user.datumRodjenja,
+        spol: user.spol,
+        tip: user.tip,
+        slika: user.slika,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Greška pri prijavi',
+      error: error.message
+    });
+  }
+};
+
+export const me = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const user = await User.findById(req.user?.id);
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'Korisnik nije pronađen'
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      user: {
+        _id: user._id,
+        ime: user.ime,
+        prezime: user.prezime,
+        email: user.email,
+        datumRodjenja: user.datumRodjenja,
+        spol: user.spol,
+        tip: user.tip,
+        slika: user.slika,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Greška pri dohvaćanju korisnika',
+      error: error.message
+    });
+  }
+};
+
+export const registerValidation = [
+  body('ime')
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('Ime mora imati između 2 i 50 karaktera'),
+  body('prezime')
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('Prezime mora imati između 2 i 50 karaktera'),
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Neispravna email adresa'),
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Lozinka mora imati najmanje 6 karaktera'),
+  body('datumRodjenja')
+    .isISO8601()
+    .toDate()
+    .withMessage('Neispravni datum rođenja'),
+  body('spol')
+    .isIn(['muški', 'ženski', 'ostalo'])
+    .withMessage('Spol mora biti: muški, ženski ili ostalo')
+];
+
+export const loginValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Neispravna email adresa'),
+  body('password')
+    .notEmpty()
+    .withMessage('Lozinka je obavezna')
+]; 

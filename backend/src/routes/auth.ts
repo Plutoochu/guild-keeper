@@ -1,17 +1,11 @@
 import { Router } from 'express';
+import { register, login, me, registerValidation, loginValidation } from '../controllers/authController';
+import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
-router.post('/register', (req, res) => {
-  res.json({ message: 'Register endpoint - implementirati' });
-});
-
-router.post('/login', (req, res) => {
-  res.json({ message: 'Login endpoint - implementirati' });
-});
-
-router.get('/me', (req, res) => {
-  res.json({ message: 'Get current user - implementirati' });
-});
+router.post('/register', registerValidation, register);
+router.post('/login', loginValidation, login);
+router.get('/me', authenticate, me);
 
 export default router; 
