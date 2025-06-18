@@ -10,6 +10,8 @@ export interface IUser extends Document {
   spol?: 'muški' | 'ženski' | 'ostalo';
   tip: 'admin' | 'user';
   slika?: string;
+  aktivan: boolean;
+  poslednjaPrijava?: Date;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -62,6 +64,15 @@ const UserSchema = new Schema<IUser>({
   slika: {
     type: String,
     default: null
+  },
+  aktivan: {
+    type: Boolean,
+    default: true,
+    required: true
+  },
+  poslednjaPrijava: {
+    type: Date,
+    required: false
   }
 }, {
   timestamps: true

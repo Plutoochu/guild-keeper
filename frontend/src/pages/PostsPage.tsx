@@ -14,7 +14,10 @@ import {
   Crown,
   BookOpen,
   Scroll,
-  Zap
+  Zap,
+  MessageCircle,
+  Megaphone,
+  FileText
 } from 'lucide-react';
 
 const PostsPage = () => {
@@ -27,6 +30,7 @@ const PostsPage = () => {
     tip: '',
     status: '',
     kategorije: '',
+    kategorijaObjave: '', 
     minLevel: '',
     maxLevel: ''
   });
@@ -49,6 +53,7 @@ const PostsPage = () => {
       if (filters.tip) params.append('tip', filters.tip);
       if (filters.status) params.append('status', filters.status);
       if (filters.kategorije) params.append('kategorije', filters.kategorije);
+      if (filters.kategorijaObjave) params.append('kategorijaObjave', filters.kategorijaObjave);
       if (filters.minLevel) params.append('minLevel', filters.minLevel);
       if (filters.maxLevel) params.append('maxLevel', filters.maxLevel);
 
@@ -81,7 +86,9 @@ const PostsPage = () => {
       case 'adventure': return <Sword className="w-5 h-5 text-red-600" />;
       case 'tavern-tale': return <Users className="w-5 h-5 text-green-600" />;
       case 'quest': return <Zap className="w-5 h-5 text-purple-600" />;
-      default: return <Scroll className="w-5 h-5 text-gray-600" />;
+      case 'discussion': return <MessageCircle className="w-5 h-5 text-blue-600" />;
+      case 'announcement': return <Megaphone className="w-5 h-5 text-orange-600" />;
+      default: return <FileText className="w-5 h-5 text-gray-600" />;
     }
   };
 
@@ -99,8 +106,10 @@ const PostsPage = () => {
     const labels = {
       campaign: 'Campaign',
       adventure: 'Adventure',
-      'tavern-tale': 'Tavern Story',
-      quest: 'Quest'
+      'tavern-tale': 'Tavern Priča',
+      quest: 'Quest',
+      discussion: 'Diskusija',
+      announcement: 'Objava'
     };
     return labels[tip as keyof typeof labels] || tip;
   };
@@ -134,31 +143,31 @@ const PostsPage = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2 flex items-center">
-              <Shield className="w-8 h-8 mr-3 text-yellow-400" />
-              Campaign Chronicles
+              <FileText className="w-8 h-8 mr-3 text-yellow-400" />
+              Objave i Kampanje
             </h1>
-            <p className="text-blue-200">Istražite epske avanture i pridružite se legendama</p>
+            <p className="text-blue-200">Istražite diskusije, objave i epske D&D avanture</p>
           </div>
           
           {user?.tip === 'admin' && (
             <Link
-              to="/admin/posts/new"
+              to="/create-post"
               className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-lg font-semibold flex items-center transition-colors"
             >
               <Crown className="w-5 h-5 mr-2" />
-              Nova Kampanja
+              Nova Objava
             </Link>
           )}
         </div>
 
         <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-8">
-          <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-6 gap-4">
+          <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-7 gap-4">
             <div className="md:col-span-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Pretražite kampanje..."
+                  placeholder="Pretražite objave..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
@@ -166,49 +175,71 @@ const PostsPage = () => {
               </div>
             </div>
 
+            {}
+            <select
+              value={filters.kategorijaObjave}
+              onChange={(e) => handleFilterChange('kategorijaObjave', e.target.value)}
+              className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            >
+              <option value="" className="bg-gray-800 text-white">Sve objave</option>
+              <option value="general" className="bg-gray-800 text-white">Općenite objave</option>
+              <option value="dnd" className="bg-gray-800 text-white">D&D sadržaj</option>
+            </select>
+
+            {}
             <select
               value={filters.tip}
               onChange={(e) => handleFilterChange('tip', e.target.value)}
               className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
             >
               <option value="" className="bg-gray-800 text-white">Svi tipovi</option>
+              <option value="discussion" className="bg-gray-800 text-white">Diskusija</option>
+              <option value="announcement" className="bg-gray-800 text-white">Objava</option>
               <option value="campaign" className="bg-gray-800 text-white">Campaign</option>
               <option value="adventure" className="bg-gray-800 text-white">Adventure</option>
-              <option value="tavern-tale" className="bg-gray-800 text-white">Tavern Story</option>
+              <option value="tavern-tale" className="bg-gray-800 text-white">Tavern Priča</option>
               <option value="quest" className="bg-gray-800 text-white">Quest</option>
             </select>
 
-            <select
-              value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            >
-              <option value="" className="bg-gray-800 text-white">Svi statusi</option>
-              <option value="planning" className="bg-gray-800 text-white">Planiranje</option>
-              <option value="active" className="bg-gray-800 text-white">Aktivno</option>
-              <option value="completed" className="bg-gray-800 text-white">Završeno</option>
-              <option value="on-hold" className="bg-gray-800 text-white">Pauzirano</option>
-            </select>
+            {}
+            {(filters.kategorijaObjave === 'dnd' || filters.kategorijaObjave === '') && (
+              <select
+                value={filters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              >
+                <option value="" className="bg-gray-800 text-white">Svi statusi</option>
+                <option value="planning" className="bg-gray-800 text-white">Planiranje</option>
+                <option value="active" className="bg-gray-800 text-white">Aktivno</option>
+                <option value="completed" className="bg-gray-800 text-white">Završeno</option>
+                <option value="on-hold" className="bg-gray-800 text-white">Pauzirano</option>
+              </select>
+            )}
 
-            <input
-              type="number"
-              placeholder="Min Level"
-              value={filters.minLevel}
-              onChange={(e) => handleFilterChange('minLevel', e.target.value)}
-              className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              min="1"
-              max="20"
-            />
+            {}
+            {(filters.kategorijaObjave === 'dnd' || filters.kategorijaObjave === '') && (
+              <>
+                <input
+                  type="number"
+                  placeholder="Min Level"
+                  value={filters.minLevel}
+                  onChange={(e) => handleFilterChange('minLevel', e.target.value)}
+                  className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  min="1"
+                  max="20"
+                />
 
-            <input
-              type="number"
-              placeholder="Max Level"
-              value={filters.maxLevel}
-              onChange={(e) => handleFilterChange('maxLevel', e.target.value)}
-              className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              min="1"
-              max="20"
-            />
+                <input
+                  type="number"
+                  placeholder="Max Level"
+                  value={filters.maxLevel}
+                  onChange={(e) => handleFilterChange('maxLevel', e.target.value)}
+                  className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  min="1"
+                  max="20"
+                />
+              </>
+            )}
           </form>
         </div>
 
@@ -228,9 +259,12 @@ const PostsPage = () => {
                     {getTypeLabel(post.tip)}
                   </span>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(post.status)}`}>
-                  {getStatusLabel(post.status)}
-                </span>
+                {}
+                {post.status && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) && (
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(post.status)}`}>
+                    {getStatusLabel(post.status)}
+                  </span>
+                )}
               </div>
 
               <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">
@@ -241,16 +275,19 @@ const PostsPage = () => {
                 {post.tekst}
               </p>
 
-              <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
-                <span className="flex items-center">
-                  <Shield className="w-4 h-4 mr-1" />
-                  Nivo {post.level.min}-{post.level.max}
-                </span>
-                <span className="flex items-center">
-                  <Users className="w-4 h-4 mr-1" />
-                  {post.igraci.min}-{post.igraci.max} igrača
-                </span>
-              </div>
+              {}
+              {post.level && post.igraci && (
+                <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
+                  <span className="flex items-center">
+                    <Shield className="w-4 h-4 mr-1" />
+                    Nivo {post.level.min}-{post.level.max}
+                  </span>
+                  <span className="flex items-center">
+                    <Users className="w-4 h-4 mr-1" />
+                    {post.igraci.min}-{post.igraci.max} igrača
+                  </span>
+                </div>
+              )}
 
               {post.lokacija && (
                 <div className="flex items-center text-sm text-gray-400 mb-4">
@@ -290,7 +327,9 @@ const PostsPage = () => {
 
               <div className="mt-4 pt-4 border-t border-white/20">
                 <div className="flex items-center text-sm text-gray-400">
-                  <span>DM: {post.autor.ime} {post.autor.prezime}</span>
+                  <span>
+                    {['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) ? 'DM' : 'Autor'}: {post.autor.ime} {post.autor.prezime}
+                  </span>
                 </div>
               </div>
             </div>
@@ -300,7 +339,7 @@ const PostsPage = () => {
         {posts.length === 0 && !loading && (
           <div className="text-center py-12">
             <Scroll className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-300 text-lg mb-2">Nema kampanja za prikazati</p>
+            <p className="text-gray-300 text-lg mb-2">Nema objava za prikazati</p>
             <p className="text-gray-400">Pokušajte s drugim filterima ili pretragom</p>
           </div>
         )}

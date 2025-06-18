@@ -2,26 +2,38 @@ import { Request, Response } from 'express';
 import Post from '../models/Post';
 import { AuthRequest } from '../middleware/auth';
 
-// Paginacija konfiguracija
+
 const DEFAULT_PAGE_SIZE = 10;
 const MAX_PAGE_SIZE = 50;
 
-// GET /api/posts - Dohvati sve kampanje sa pagination i filterima
+
 export const getAllPosts = async (req: Request, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
     const skip = (page - 1) * limit;
 
-    // Filter parametri
+    
     const filters: any = {};
     
-    // Samo javne objave ako nije admin ili autor
+    
     if (req.query.javno !== 'false') {
       filters.javno = true;
     }
 
-    if (req.query.tip) {
+    
+    if (req.query.kategorijaObjave) {
+      if (req.query.kategorijaObjave === 'general') {
+        
+        filters.tip = { $in: ['discussion', 'announcement'] };
+      } else if (req.query.kategorijaObjave === 'dnd') {
+        
+        filters.tip = { $in: ['campaign', 'adventure', 'tavern-tale', 'quest'] };
+      }
+    }
+
+    
+    if (req.query.tip && !req.query.kategorijaObjave) {
       filters.tip = req.query.tip;
     }
 
@@ -43,12 +55,12 @@ export const getAllPosts = async (req: Request, res: Response): Promise<void> =>
       filters.tagovi = { $in: tagovi };
     }
 
-    // Pretraga po nazivu ili opisu
+    
     if (req.query.search) {
       filters.$text = { $search: req.query.search };
     }
 
-    // Level range filter
+    
     if (req.query.minLevel || req.query.maxLevel) {
       filters.$and = filters.$and || [];
       if (req.query.minLevel) {
@@ -59,8 +71,8 @@ export const getAllPosts = async (req: Request, res: Response): Promise<void> =>
       }
     }
 
-    // Sortiranje
-    let sort: any = { createdAt: -1 }; // default najnovije prvo
+    
+    let sort: any = { createdAt: -1 }; 
     if (req.query.sortBy) {
       const sortField = req.query.sortBy as string;
       const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
@@ -91,15 +103,15 @@ export const getAllPosts = async (req: Request, res: Response): Promise<void> =>
     });
 
   } catch (error) {
-    console.error('Greška pri dohvaćanju kampanja:', error);
+    console.error('Greška pri dohvaćanju objava:', error);
     res.status(500).json({
       success: false,
-      message: 'Greška pri dohvaćanju kampanja'
+      message: 'Greška pri dohvaćanju objava'
     });
   }
 };
 
-// GET /api/posts/:id - Dohvati jednu kampanju
+
 export const getPostById = async (req: Request, res: Response): Promise<void> => {
   try {
     const post = await Post.findById(req.params.id);
@@ -107,19 +119,19 @@ export const getPostById = async (req: Request, res: Response): Promise<void> =>
     if (!post) {
       res.status(404).json({
         success: false,
-        message: 'Kampanja nije pronađena'
+        message: 'Objava nije pronađena'
       });
       return;
     }
 
-    // Provjeri da li je javna ili korisnik ima pristup
+    
     const authReq = req as AuthRequest;
     const user = authReq.user;
     
     if (!post.javno && (!user || (user.tip !== 'admin' && (post.autor as any)._id.toString() !== user.id))) {
       res.status(403).json({
         success: false,
-        message: 'Nemate dozvolu za pristup ovoj kampanji'
+        message: 'Nemate dozvolu za pristup ovoj objavi'
       });
       return;
     }
@@ -130,46 +142,48 @@ export const getPostById = async (req: Request, res: Response): Promise<void> =>
     });
 
   } catch (error) {
-    console.error('Greška pri dohvaćanju kampanje:', error);
+    console.error('Greška pri dohvaćanju objave:', error);
     res.status(500).json({
       success: false,
-      message: 'Greška pri dohvaćanju kampanje'
+      message: 'Greška pri dohvaćanju objave'
     });
   }
 };
 
-// POST /api/posts - Kreiraj novu kampanju (samo admin/DM)
+
 export const createPost = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const user = req.user!;
 
-    // Samo admin može kreirati kampanje
+    
     if (user.tip !== 'admin') {
       res.status(403).json({
         success: false,
-        message: 'Samo Dungeon Master može kreirati kampanje'
+        message: 'Samo admin može kreirati postove'
       });
       return;
     }
 
-    const {
-      naslov,
-      tekst,
-      tip,
-      kategorije,
-      tagovi,
-      level,
-      igraci,
-      lokacija,
-      status,
-      javno
-    } = req.body;
+      const {
+    naslov,
+    tekst,
+    tip,
+    kategorije,
+    tagovi,
+    level,
+    igraci,
+    lokacija,
+    status,
+    javno,
+    zakljucaniKomentari,
+    prikvacen
+  } = req.body;
 
-    // Validacija obaveznih polja
+    
     if (!naslov || !tekst) {
       res.status(400).json({
         success: false,
-        message: 'Naslov i opis kampanje su obavezni'
+        message: 'Naslov i sadržaj su obavezni'
       });
       return;
     }
@@ -178,14 +192,16 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
       naslov,
       tekst,
       autor: user.id,
-      tip: tip || 'campaign',
+      tip: tip || 'discussion',
       kategorije: kategorije || [],
       tagovi: tagovi || [],
-      level: level || { min: 1, max: 20 },
-      igraci: igraci || { min: 2, max: 6 },
-      lokacija: lokacija || '',
-      status: status || 'planning',
-      javno: javno !== undefined ? javno : true
+      level: level,
+      igraci: igraci,
+      lokacija: lokacija,
+      status: status,
+      javno: javno !== undefined ? javno : true,
+      zakljucaniKomentari: zakljucaniKomentari || false,
+      prikvacen: prikvacen || false
     });
 
     const savedPost = await newPost.save();
@@ -193,7 +209,7 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
 
     res.status(201).json({
       success: true,
-      message: 'Kampanja uspješno kreirana',
+      message: 'Post uspješno kreiran',
       data: savedPost
     });
 
@@ -216,7 +232,7 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-// PUT /api/posts/:id - Ažuriraj kampanju (samo autor ili admin)
+
 export const updatePost = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const user = req.user!;
@@ -239,7 +255,7 @@ export const updatePost = async (req: AuthRequest, res: Response): Promise<void>
     }
 
     const updateData = { ...req.body };
-    delete updateData.autor; // Sprečiti mijenjanje autora
+    delete updateData.autor; 
 
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.id,
@@ -272,7 +288,7 @@ export const updatePost = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-// DELETE /api/posts/:id - Obriši kampanju (samo autor ili admin)
+
 export const deletePost = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const user = req.user!;
@@ -310,7 +326,7 @@ export const deletePost = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-// GET /api/posts/categories - Dohvati sve dostupne kategorije
+
 export const getCategories = async (req: Request, res: Response): Promise<void> => {
   try {
     const categories = await Post.distinct('kategorije');
@@ -329,7 +345,7 @@ export const getCategories = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// GET /api/posts/tags - Dohvati sve dostupne tagove
+
 export const getTags = async (req: Request, res: Response): Promise<void> => {
   try {
     const tags = await Post.distinct('tagovi');
@@ -348,7 +364,7 @@ export const getTags = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// GET /api/posts/my - Dohvati kampanje trenutnog korisnika
+
 export const getMyPosts = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const user = req.user!;

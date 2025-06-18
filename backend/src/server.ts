@@ -10,6 +10,7 @@ import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import postRoutes from './routes/posts';
+import commentRoutes from './routes/comments';
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api', commentRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({

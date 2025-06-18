@@ -7,6 +7,8 @@ export interface User {
   spol: 'muški' | 'ženski' | 'ostalo';
   tip: 'admin' | 'user';
   slika?: string;
+  aktivan: boolean;
+  poslednjaPrijava?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -16,20 +18,31 @@ export interface Post {
   naslov: string;
   tekst: string;
   autor: User;
-  tip: 'campaign' | 'adventure' | 'tavern-tale' | 'quest';
+  tip: 'campaign' | 'adventure' | 'tavern-tale' | 'quest' | 'discussion' | 'announcement';
   kategorije: string[];
   tagovi: string[];
-  level: {
+  level?: {
     min: number;
     max: number;
   };
-  igraci: {
+  igraci?: {
     min: number;
     max: number;
   };
-  lokacija: string;
-  status: 'planning' | 'active' | 'completed' | 'on-hold';
+  lokacija?: string;
+  status?: 'planning' | 'active' | 'completed' | 'on-hold';
   javno: boolean;
+  zakljucaniKomentari: boolean;
+  prikvacen: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Comment {
+  _id: string;
+  tekst: string;
+  autor: User;
+  post: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -72,20 +85,22 @@ export interface CreateUserData extends RegisterData {
 export interface CreatePostData {
   naslov: string;
   tekst: string;
-  tip: 'campaign' | 'adventure' | 'tavern-tale' | 'quest';
+  tip: 'campaign' | 'adventure' | 'tavern-tale' | 'quest' | 'discussion' | 'announcement';
   kategorije: string[];
   tagovi: string[];
-  level: {
+  level?: {
     min: number;
     max: number;
   };
-  igraci: {
+  igraci?: {
     min: number;
     max: number;
   };
-  lokacija: string;
-  status: 'planning' | 'active' | 'completed' | 'on-hold';
+  lokacija?: string;
+  status?: 'planning' | 'active' | 'completed' | 'on-hold';
   javno: boolean;
+  zakljucaniKomentari: boolean;
+  prikvacen: boolean;
 }
 
 export interface ApiResponse<T> {
@@ -103,5 +118,54 @@ export interface PaginatedResponse<T> {
     limit: number;
     total: number;
     pages: number;
+  };
+}
+
+export interface UsersResponse {
+  success: boolean;
+  data: {
+    users: User[];
+    pagination: {
+      currentPage: number;
+      totalPages: number;
+      totalUsers: number;
+      usersPerPage: number;
+      hasNextPage: boolean;
+      hasPrevPage: boolean;
+    };
+    stats: {
+      ukupno: number;
+      aktivni: number;
+      admini: number;
+      obicniKorisnici: number;
+    };
+  };
+}
+
+export interface UserFilters {
+  search?: string;
+  tip?: 'admin' | 'user' | '';
+  aktivan?: boolean | '';
+  sortBy?: 'ime' | 'email' | 'createdAt' | 'poslednjaPrijava';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface BulkAction {
+  userIds: string[];
+  action: 'activate' | 'deactivate' | 'delete' | 'makeAdmin' | 'makeUser';
+}
+
+export interface CommentsResponse {
+  success: boolean;
+  data: {
+    comments: Comment[];
+    pagination: {
+      currentPage: number;
+      totalPages: number;
+      totalComments: number;
+      commentsPerPage: number;
+      hasNextPage: boolean;
+      hasPrevPage: boolean;
+    };
   };
 } 
