@@ -115,7 +115,7 @@ const HomePage = () => {
         {!isAdmin && (
           <div className="bg-gray-100 p-6 rounded-lg shadow border-2 border-dashed border-gray-300">
             <LogIn className="h-8 w-8 mb-3 text-gray-400" />
-            <h3 className="text-lg font-semibold mb-2 text-gray-700">Dungeon Master značke</h3>
+                            <h3 className="text-lg font-semibold mb-2 text-gray-700">Dungeon Master</h3>
             <p className="text-gray-500">
               Kontaktirajte administratora za Dungeon Master prava
             </p>

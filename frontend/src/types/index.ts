@@ -16,6 +16,20 @@ export interface Post {
   naslov: string;
   tekst: string;
   autor: User;
+  tip: 'campaign' | 'adventure' | 'tavern-tale' | 'quest';
+  kategorije: string[];
+  tagovi: string[];
+  level: {
+    min: number;
+    max: number;
+  };
+  igraci: {
+    min: number;
+    max: number;
+  };
+  lokacija: string;
+  status: 'planning' | 'active' | 'completed' | 'on-hold';
+  javno: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -58,6 +72,20 @@ export interface CreateUserData extends RegisterData {
 export interface CreatePostData {
   naslov: string;
   tekst: string;
+  tip: 'campaign' | 'adventure' | 'tavern-tale' | 'quest';
+  kategorije: string[];
+  tagovi: string[];
+  level: {
+    min: number;
+    max: number;
+  };
+  igraci: {
+    min: number;
+    max: number;
+  };
+  lokacija: string;
+  status: 'planning' | 'active' | 'completed' | 'on-hold';
+  javno: boolean;
 }
 
 export interface ApiResponse<T> {

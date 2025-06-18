@@ -27,7 +27,7 @@ const profileSchema = yup.object().shape({
   spol: yup.string()
     .notRequired()
     .nullable()
-    .oneOf(['muški', 'ženski', 'ostalo'], 'Spol mora biti: muški, ženski ili ostalo')
+    .oneOf(['', 'muški', 'ženski', 'ostalo'], 'Spol mora biti: muški, ženski ili ostalo')
 });
 
 interface ProfileFormData {

@@ -5,7 +5,7 @@ import Layout from './components/Layout/Layout';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 
-// Pages
+
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -15,13 +15,14 @@ import UsersPage from './pages/UsersPage';
 import UserDetailsPage from './pages/UserDetailsPage';
 import PostsPage from './pages/PostsPage';
 import PostDetailsPage from './pages/PostDetailsPage';
+import CreatePostPage from './pages/CreatePostPage';
 
 function App() {
   return (
     <AuthProvider>
       <div className="App">
         <Routes>
-          {/* Public routes */}
+          {}
           <Route path="/" element={<Layout />}>
             <Route index element={<HomePage />} />
             <Route path="login" element={<LoginPage />} />
@@ -29,20 +30,21 @@ function App() {
             <Route path="posts" element={<PostsPage />} />
             <Route path="posts/:id" element={<PostDetailsPage />} />
             
-            {/* Private routes */}
+            {}
             <Route element={<PrivateRoute />}>
               <Route path="profile" element={<ProfilePage />} />
             </Route>
             
-            {/* Admin routes */}
+            {}
             <Route element={<AdminRoute />}>
               <Route path="admin" element={<AdminDashboard />} />
               <Route path="admin/users" element={<UsersPage />} />
               <Route path="admin/users/:id" element={<UserDetailsPage />} />
+              <Route path="admin/posts/new" element={<CreatePostPage />} />
             </Route>
           </Route>
           
-          {/* 404 page */}
+          {}
           <Route path="*" element={
             <div className="min-h-screen flex items-center justify-center">
               <div className="text-center">

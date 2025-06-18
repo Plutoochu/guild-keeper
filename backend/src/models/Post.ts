@@ -4,6 +4,20 @@ export interface IPost extends Document {
   naslov: string;
   tekst: string;
   autor: Schema.Types.ObjectId;
+  tip: 'campaign' | 'adventure' | 'tavern-tale' | 'quest';
+  kategorije: string[];
+  tagovi: string[];
+  level: {
+    min: number;
+    max: number;
+  };
+  igraci: {
+    min: number;
+    max: number;
+  };
+  lokacija: string;
+  status: 'planning' | 'active' | 'completed' | 'on-hold';
+  javno: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -11,26 +25,95 @@ export interface IPost extends Document {
 const PostSchema = new Schema<IPost>({
   naslov: {
     type: String,
-    required: [true, 'Naslov je obavezan'],
+    required: [true, 'Naslov kampanje je obavezan'],
     trim: true,
-    maxlength: [200, 'Naslov ne može biti duži od 200 karaktera']
+    maxlength: [50, 'Naslov ne može biti duži od 50 karaktera']
   },
   tekst: {
     type: String,
-    required: [true, 'Tekst je obavezan'],
+    required: [true, 'Opis kampanje je obavezan'],
     trim: true,
-    maxlength: [5000, 'Tekst ne može biti duži od 5000 karaktera']
+    maxlength: [10000, 'Opis ne može biti duži od 10000 karaktera']
   },
   autor: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
+  },
+  tip: {
+    type: String,
+    enum: ['campaign', 'adventure', 'tavern-tale', 'quest'],
+    default: 'campaign',
+    required: true
+  },
+  kategorije: {
+    type: [String],
+    default: [],
+    validate: {
+      validator: function(kategorije: string[]) {
+        return kategorije.length <= 5;
+      },
+      message: 'Maksimalno 5 kategorija dozvoljeno'
+    }
+  },
+  tagovi: {
+    type: [String],
+    default: [],
+    validate: {
+      validator: function(tagovi: string[]) {
+        return tagovi.length <= 10;
+      },
+      message: 'Maksimalno 10 tagova dozvoljeno'
+    }
+  },
+  level: {
+    min: {
+      type: Number,
+      min: 1,
+      max: 20,
+      default: 1
+    },
+    max: {
+      type: Number,
+      min: 1,
+      max: 20,
+      default: 20
+    }
+  },
+  igraci: {
+    min: {
+      type: Number,
+      min: 1,
+      max: 10,
+      default: 2
+    },
+    max: {
+      type: Number,
+      min: 1,
+      max: 10,
+      default: 6
+    }
+  },
+  lokacija: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Lokacija ne može biti duža od 100 karaktera'],
+    default: ''
+  },
+  status: {
+    type: String,
+    enum: ['planning', 'active', 'completed', 'on-hold'],
+    default: 'planning'
+  },
+  javno: {
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true
 });
 
-// Populiraj autora prilikom dohvaćanja
+
 PostSchema.pre(/^find/, function(this: any) {
   this.populate({
     path: 'autor',
@@ -38,7 +121,28 @@ PostSchema.pre(/^find/, function(this: any) {
   });
 });
 
-// Ukloni __v field iz output-a
+
+PostSchema.pre('save', function(this: IPost) {
+  if (this.level.max < this.level.min) {
+    this.level.max = this.level.min;
+  }
+  if (this.igraci.max < this.igraci.min) {
+    this.igraci.max = this.igraci.min;
+  }
+});
+
+
+PostSchema.index({ naslov: 'text', tekst: 'text' });
+
+
+PostSchema.index({ kategorije: 1 });
+PostSchema.index({ tagovi: 1 });
+PostSchema.index({ autor: 1 });
+PostSchema.index({ createdAt: -1 });
+PostSchema.index({ tip: 1 });
+PostSchema.index({ status: 1 });
+
+
 PostSchema.set('toJSON', {
   transform: function(doc: any, ret: any) {
     delete ret.__v;

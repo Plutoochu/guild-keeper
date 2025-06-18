@@ -1,25 +1,25 @@
 import { Router } from 'express';
+import { authenticate } from '../middleware/auth';
+import {
+  getAllPosts,
+  getPostById,
+  createPost,
+  updatePost,
+  deletePost,
+  getCategories,
+  getTags,
+  getMyPosts
+} from '../controllers/postsController';
 
 const router = Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Get all posts - implementirati' });
-});
-
-router.get('/:id', (req, res) => {
-  res.json({ message: 'Get post by ID - implementirati' });
-});
-
-router.post('/', (req, res) => {
-  res.json({ message: 'Create post - implementirati' });
-});
-
-router.put('/:id', (req, res) => {
-  res.json({ message: 'Update post - implementirati' });
-});
-
-router.delete('/:id', (req, res) => {
-  res.json({ message: 'Delete post - implementirati' });
-});
+router.get('/', getAllPosts);
+router.get('/categories', getCategories);
+router.get('/tags', getTags);
+router.get('/my', authenticate, getMyPosts);
+router.get('/:id', getPostById);
+router.post('/', authenticate, createPost);
+router.put('/:id', authenticate, updatePost);
+router.delete('/:id', authenticate, deletePost);
 
 export default router; 
