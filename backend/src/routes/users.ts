@@ -1,25 +1,40 @@
 import { Router } from 'express';
+import { authenticate, requireAdmin } from '../middleware/auth';
+import {
+  getAllUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+  toggleUserRole,
+  toggleUserStatus,
+  bulkUserActions
+} from '../controllers/usersController';
 
 const router = Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Get all users - implementirati' });
-});
 
-router.get('/:id', (req, res) => {
-  res.json({ message: 'Get user by ID - implementirati' });
-});
+router.get('/', authenticate, requireAdmin, getAllUsers);
 
-router.post('/', (req, res) => {
-  res.json({ message: 'Create user - implementirati' });
-});
 
-router.put('/:id', (req, res) => {
-  res.json({ message: 'Update user - implementirati' });
-});
+router.get('/:id', authenticate, getUserById);
 
-router.delete('/:id', (req, res) => {
-  res.json({ message: 'Delete user - implementirati' });
-});
+
+router.post('/', authenticate, requireAdmin, createUser);
+
+
+router.put('/:id', authenticate, updateUser);
+
+
+router.delete('/:id', authenticate, requireAdmin, deleteUser);
+
+
+router.put('/:id/toggle-role', authenticate, requireAdmin, toggleUserRole);
+
+
+router.put('/:id/toggle-status', authenticate, requireAdmin, toggleUserStatus);
+
+
+router.post('/bulk-actions', authenticate, requireAdmin, bulkUserActions);
 
 export default router; 

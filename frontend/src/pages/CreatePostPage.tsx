@@ -8,13 +8,17 @@ import {
   Users, 
   MapPin, 
   Crown,
-  BookOpen,
-  Scroll,
-  Zap,
-  Sword,
   ArrowLeft,
   Plus,
-  X
+  X,
+  MessageSquare,
+  Megaphone,
+  Lock,
+  Unlock,
+  Pin,
+  PinOff,
+  Sword,
+  Zap
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -25,7 +29,7 @@ const CreatePostPage = () => {
   const [formData, setFormData] = useState<CreatePostData>({
     naslov: '',
     tekst: '',
-    tip: 'campaign',
+    tip: 'discussion',
     kategorije: [],
     tagovi: [],
     level: { min: 1, max: 20 },
@@ -33,6 +37,8 @@ const CreatePostPage = () => {
     lokacija: '',
     status: 'planning',
     javno: true,
+    zakljucaniKomentari: false,
+    prikvacen: false
   });
   const [newKategorija, setNewKategorija] = useState('');
   const [newTag, setNewTag] = useState('');
@@ -48,7 +54,7 @@ const CreatePostPage = () => {
               onClick={() => navigate('/posts')}
               className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-lg font-semibold transition-colors"
             >
-              Nazad na kampanje
+              Nazad na postove
             </button>
           </div>
         </div>
@@ -56,31 +62,32 @@ const CreatePostPage = () => {
     );
   }
 
+  const isCampaignType = ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(formData.tip);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.naslov.trim() || !formData.tekst.trim()) {
-      toast.error('Naslov i opis kampanje su obavezni');
-      return;
-    }
-
-    if (formData.level.min > formData.level.max) {
-      toast.error('Minimalni nivo ne može biti veći od maksimalnog');
-      return;
-    }
-
-    if (formData.igraci.min > formData.igraci.max) {
-      toast.error('Minimalni broj igrača ne može biti veći od maksimalnog');
+      toast.error('Naslov i tekst su obavezni');
       return;
     }
 
     try {
       setLoading(true);
-      const response = await axios.post('/posts', formData);
-      toast.success('Kampanja je uspješno kreirana');
+      const submitData = { ...formData };
+      
+      if (!isCampaignType) {
+        delete submitData.level;
+        delete submitData.igraci;
+        delete submitData.lokacija;
+        delete submitData.status;
+      }
+
+      const response = await axios.post('/posts', submitData);
+      toast.success('Post je uspješno kreiran');
       navigate(`/posts/${response.data.data._id}`);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Greška pri kreiranju kampanje');
+      toast.error(err.response?.data?.message || 'Greška pri kreiranju posta');
     } finally {
       setLoading(false);
     }
@@ -133,7 +140,9 @@ const CreatePostPage = () => {
       case 'adventure': return <Sword className="w-5 h-5" />;
       case 'tavern-tale': return <Users className="w-5 h-5" />;
       case 'quest': return <Zap className="w-5 h-5" />;
-      default: return <Scroll className="w-5 h-5" />;
+      case 'discussion': return <MessageSquare className="w-5 h-5" />;
+      case 'announcement': return <Megaphone className="w-5 h-5" />;
+      default: return <MessageSquare className="w-5 h-5" />;
     }
   };
 
@@ -142,11 +151,11 @@ const CreatePostPage = () => {
       <div className="container mx-auto px-6">
         <div className="mb-6">
           <button
-            onClick={() => navigate('/posts')}
+            onClick={() => navigate('/admin')}
             className="inline-flex items-center text-yellow-400 hover:text-yellow-300 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Nazad na kampanje
+            Nazad na admin dashboard
           </button>
         </div>
 
@@ -154,183 +163,79 @@ const CreatePostPage = () => {
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-white mb-2 flex items-center">
               <Crown className="w-8 h-8 mr-3 text-yellow-400" />
-              Kreiraj Novu Kampanju
+              Kreiraj Novi Post
             </h1>
-            <p className="text-blue-200">Stvori epsku avanturu za svoje igrače</p>
+            <p className="text-blue-200">Stvori kampanju, diskusiju ili objavu za zajednicu</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
+            <div>
+              <label className="block text-white font-medium mb-4 text-lg">
+                Tip posta *
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { value: 'discussion', label: 'Diskusija', desc: 'Otvori temu za diskusiju' },
+                  { value: 'announcement', label: 'Objava', desc: 'Službena objava/vijest' },
+                  { value: 'campaign', label: 'Kampanja', desc: 'D&D kampanja' },
+                  { value: 'adventure', label: 'Avantura', desc: 'Jedna sesija' },
+                  { value: 'tavern-tale', label: 'Tavern Priča', desc: 'Kratka priča' },
+                  { value: 'quest', label: 'Quest', desc: 'Poseban zadatak' }
+                ].map((tip) => (
+                  <label
+                    key={tip.value}
+                    className={`flex flex-col p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                      formData.tip === tip.value
+                        ? 'border-yellow-400 bg-yellow-400/20'
+                        : 'border-white/30 bg-white/10 hover:bg-white/20'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="tip"
+                      value={tip.value}
+                      checked={formData.tip === tip.value}
+                      onChange={(e) => handleInputChange('tip', e.target.value)}
+                      className="sr-only"
+                    />
+                    <div className="flex items-center mb-2">
+                      {getTypeIcon(tip.value)}
+                      <span className="ml-2 text-white font-medium">{tip.label}</span>
+                    </div>
+                    <span className="text-gray-300 text-sm">{tip.desc}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <div>
                   <label className="block text-white font-medium mb-2">
-                    Naslov kampanje *
+                    Naslov *
                   </label>
                   <input
                     type="text"
                     value={formData.naslov}
                     onChange={(e) => handleInputChange('naslov', e.target.value)}
                     className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                    placeholder="Unesite naslov kampanje..."
-                    maxLength={50}
+                    placeholder="Unesite naslov..."
+                    maxLength={200}
                     required
                   />
-                  <p className="text-gray-400 text-sm mt-1">{formData.naslov.length}/50 karaktera</p>
+                  <p className="text-gray-400 text-sm mt-1">{formData.naslov.length}/200 karaktera</p>
                 </div>
 
                 <div>
                   <label className="block text-white font-medium mb-2">
-                    Tip kampanje
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {[
-                      { value: 'campaign', label: 'Campaign' },
-                      { value: 'adventure', label: 'Adventure' },
-                      { value: 'tavern-tale', label: 'Tavern Story' },
-                      { value: 'quest', label: 'Quest' }
-                    ].map((tip) => (
-                      <label
-                        key={tip.value}
-                        className={`flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                          formData.tip === tip.value
-                            ? 'border-yellow-400 bg-yellow-400/20'
-                            : 'border-white/30 bg-white/10 hover:bg-white/20'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="tip"
-                          value={tip.value}
-                          checked={formData.tip === tip.value}
-                          onChange={(e) => handleInputChange('tip', e.target.value as any)}
-                          className="sr-only"
-                        />
-                        <div className="flex items-center">
-                          {getTypeIcon(tip.value)}
-                          <span className="ml-2 text-white">{tip.label}</span>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-white font-medium mb-2">
-                    Status kampanje
-                  </label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => handleInputChange('status', e.target.value as any)}
-                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                  >
-                    <option value="planning" className="bg-gray-800 text-white">Planiranje</option>
-                    <option value="active" className="bg-gray-800 text-white">Aktivno</option>
-                    <option value="completed" className="bg-gray-800 text-white">Završeno</option>
-                    <option value="on-hold" className="bg-gray-800 text-white">Pauzirano</option>
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white font-medium mb-2">
-                      <Shield className="w-4 h-4 inline mr-1" />
-                      Nivo (Min)
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="20"
-                      value={formData.level.min}
-                      onChange={(e) => handleInputChange('level', { ...formData.level, min: parseInt(e.target.value) || 1 })}
-                      className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white font-medium mb-2">
-                      <Shield className="w-4 h-4 inline mr-1" />
-                      Nivo (Max)
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="20"
-                      value={formData.level.max}
-                      onChange={(e) => handleInputChange('level', { ...formData.level, max: parseInt(e.target.value) || 20 })}
-                      className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white font-medium mb-2">
-                      <Users className="w-4 h-4 inline mr-1" />
-                      Igrači (Min)
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={formData.igraci.min}
-                      onChange={(e) => handleInputChange('igraci', { ...formData.igraci, min: parseInt(e.target.value) || 1 })}
-                      className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white font-medium mb-2">
-                      <Users className="w-4 h-4 inline mr-1" />
-                      Igrači (Max)
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={formData.igraci.max}
-                      onChange={(e) => handleInputChange('igraci', { ...formData.igraci, max: parseInt(e.target.value) || 10 })}
-                      className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-white font-medium mb-2">
-                    <MapPin className="w-4 h-4 inline mr-1" />
-                    Lokacija
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.lokacija}
-                    onChange={(e) => handleInputChange('lokacija', e.target.value)}
-                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                    placeholder="Gdje se odvija kampanja..."
-                    maxLength={100}
-                  />
-                </div>
-
-                <div>
-                  <label className="flex items-center text-white">
-                    <input
-                      type="checkbox"
-                      checked={formData.javno}
-                      onChange={(e) => handleInputChange('javno', e.target.checked)}
-                      className="mr-3 w-4 h-4 text-yellow-400 bg-white/20 border-white/30 rounded focus:ring-yellow-400"
-                    />
-                    Javna kampanja (vidljiva svim korisnicima)
-                  </label>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-white font-medium mb-2">
-                    Opis kampanje *
+                    Sadržaj *
                   </label>
                   <textarea
                     value={formData.tekst}
                     onChange={(e) => handleInputChange('tekst', e.target.value)}
-                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                    placeholder="Opišite svoju epsku kampanju..."
                     rows={8}
+                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"
+                    placeholder="Napišite sadržaj..."
                     maxLength={10000}
                     required
                   />
@@ -346,36 +251,33 @@ const CreatePostPage = () => {
                       type="text"
                       value={newKategorija}
                       onChange={(e) => setNewKategorija(e.target.value)}
-                      className="flex-1 px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                      placeholder="Dodaj kategoriju..."
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addKategorija())}
+                      className="flex-1 px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                      placeholder="Dodaj kategoriju..."
+                      maxLength={30}
                     />
                     <button
                       type="button"
                       onClick={addKategorija}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg transition-colors"
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {formData.kategorije.map((kategorija, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-sm flex items-center"
-                      >
+                      <span key={index} className="inline-flex items-center bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
                         {kategorija}
                         <button
                           type="button"
                           onClick={() => removeKategorija(index)}
-                          className="ml-2 text-yellow-300 hover:text-yellow-100"
+                          className="ml-2 hover:text-red-300"
                         >
                           <X className="w-3 h-3" />
                         </button>
                       </span>
                     ))}
                   </div>
-                  <p className="text-gray-400 text-sm mt-1">Maksimalno 5 kategorija</p>
                 </div>
 
                 <div>
@@ -387,62 +289,222 @@ const CreatePostPage = () => {
                       type="text"
                       value={newTag}
                       onChange={(e) => setNewTag(e.target.value)}
-                      className="flex-1 px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                      placeholder="Dodaj tag..."
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                      className="flex-1 px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                      placeholder="Dodaj tag..."
+                      maxLength={20}
                     />
                     <button
                       type="button"
                       onClick={addTag}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {formData.tagovi.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm flex items-center"
-                      >
+                      <span key={index} className="inline-flex items-center bg-purple-600 text-white px-3 py-1 rounded-full text-sm">
                         #{tag}
                         <button
                           type="button"
                           onClick={() => removeTag(index)}
-                          className="ml-2 text-blue-300 hover:text-blue-100"
+                          className="ml-2 hover:text-red-300"
                         >
                           <X className="w-3 h-3" />
                         </button>
                       </span>
                     ))}
                   </div>
-                  <p className="text-gray-400 text-sm mt-1">Maksimalno 10 tagova</p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {isCampaignType && (
+                  <>
+                    <div>
+                      <label className="block text-white font-medium mb-2 flex items-center">
+                        <Shield className="w-4 h-4 mr-2" />
+                        Nivo igrača
+                      </label>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-gray-300 text-sm mb-1">Min</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="20"
+                            value={formData.level?.min || 1}
+                            onChange={(e) => handleInputChange('level', { ...formData.level, min: parseInt(e.target.value) })}
+                            className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-gray-300 text-sm mb-1">Max</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="20"
+                            value={formData.level?.max || 20}
+                            onChange={(e) => handleInputChange('level', { ...formData.level, max: parseInt(e.target.value) })}
+                            className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-white font-medium mb-2 flex items-center">
+                        <Users className="w-4 h-4 mr-2" />
+                        Broj igrača
+                      </label>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-gray-300 text-sm mb-1">Min</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            value={formData.igraci?.min || 2}
+                            onChange={(e) => handleInputChange('igraci', { ...formData.igraci, min: parseInt(e.target.value) })}
+                            className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-gray-300 text-sm mb-1">Max</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            value={formData.igraci?.max || 6}
+                            onChange={(e) => handleInputChange('igraci', { ...formData.igraci, max: parseInt(e.target.value) })}
+                            className="w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-white font-medium mb-2 flex items-center">
+                        <MapPin className="w-4 h-4 mr-2" />
+                        Lokacija
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.lokacija || ''}
+                        onChange={(e) => handleInputChange('lokacija', e.target.value)}
+                        className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        placeholder="Gdje se odvija..."
+                        maxLength={100}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-white font-medium mb-2">Status</label>
+                      <select
+                        value={formData.status || 'planning'}
+                        onChange={(e) => handleInputChange('status', e.target.value)}
+                        className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                      >
+                        <option value="planning" className="bg-gray-800">Planiranje</option>
+                        <option value="active" className="bg-gray-800">Aktivna</option>
+                        <option value="completed" className="bg-gray-800">Završena</option>
+                        <option value="on-hold" className="bg-gray-800">Na čekanju</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+
+                <div className="space-y-4">
+                  <h3 className="text-white font-medium text-lg border-b border-white/20 pb-2">
+                    Postavke
+                  </h3>
+                  
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center text-white">
+                      <Shield className="w-4 h-4 mr-2" />
+                      Javni post
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => handleInputChange('javno', !formData.javno)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full ${
+                        formData.javno ? 'bg-green-600' : 'bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                          formData.javno ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center text-white">
+                      {formData.zakljucaniKomentari ? <Lock className="w-4 h-4 mr-2" /> : <Unlock className="w-4 h-4 mr-2" />}
+                      Zaključaj komentare
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => handleInputChange('zakljucaniKomentari', !formData.zakljucaniKomentari)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full ${
+                        formData.zakljucaniKomentari ? 'bg-red-600' : 'bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                          formData.zakljucaniKomentari ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center text-white">
+                      {formData.prikvacen ? <Pin className="w-4 h-4 mr-2" /> : <PinOff className="w-4 h-4 mr-2" />}
+                      Pin
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => handleInputChange('prikvacen', !formData.prikvacen)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full ${
+                        formData.prikvacen ? 'bg-yellow-600' : 'bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                          formData.prikvacen ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-end gap-4 pt-6 border-t border-white/20">
+            <div className="flex justify-end space-x-4 pt-6 border-t border-white/20">
               <button
                 type="button"
-                onClick={() => navigate('/posts')}
-                className="px-6 py-3 text-gray-300 hover:text-white transition-colors"
+                onClick={() => navigate('/admin')}
+                className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
               >
                 Otkaži
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-black px-8 py-3 rounded-lg font-semibold transition-colors flex items-center"
+                className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Kreiranje...
                   </>
                 ) : (
                   <>
-                    <Crown className="w-4 h-4 mr-2" />
-                    Kreiraj Kampanju
+                    <Plus className="w-4 h-4 mr-2" />
+                    Kreiraj Post
                   </>
                 )}
               </button>

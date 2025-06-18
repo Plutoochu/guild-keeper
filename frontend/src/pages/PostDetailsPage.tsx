@@ -16,9 +16,13 @@ import {
   Edit,
   Trash2,
   ArrowLeft,
-  User
+  User,
+  MessageCircle,
+  Megaphone,
+  FileText
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Comments from '../components/Comments';
 
 const PostDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +43,7 @@ const PostDetailsPage = () => {
       const response = await axios.get(`/posts/${id}`);
       setPost(response.data.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Greška pri učitavanju kampanje');
+      setError(err.response?.data?.message || 'Greška pri učitavanju objave');
     } finally {
       setLoading(false);
     }
@@ -48,10 +52,10 @@ const PostDetailsPage = () => {
   const handleDelete = async () => {
     try {
       await axios.delete(`/posts/${id}`);
-      toast.success('Kampanja je uspješno obrisana');
+      toast.success('Objava je uspješno obrisana');
       navigate('/posts');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Greška pri brisanju kampanje');
+      toast.error(err.response?.data?.message || 'Greška pri brisanju objave');
     }
   };
 
@@ -61,7 +65,9 @@ const PostDetailsPage = () => {
       case 'adventure': return <Sword className="w-6 h-6 text-red-400" />;
       case 'tavern-tale': return <Users className="w-6 h-6 text-green-400" />;
       case 'quest': return <Zap className="w-6 h-6 text-purple-400" />;
-      default: return <Scroll className="w-6 h-6 text-gray-400" />;
+      case 'discussion': return <MessageCircle className="w-6 h-6 text-blue-400" />;
+      case 'announcement': return <Megaphone className="w-6 h-6 text-orange-400" />;
+      default: return <FileText className="w-6 h-6 text-gray-400" />;
     }
   };
 
@@ -79,8 +85,10 @@ const PostDetailsPage = () => {
     const labels = {
       campaign: 'Campaign',
       adventure: 'Adventure',
-      'tavern-tale': 'Tavern Story',
-      quest: 'Quest'
+      'tavern-tale': 'Tavern Priča',
+      quest: 'Quest',
+      discussion: 'Diskusija',
+      announcement: 'Objava'
     };
     return labels[tip as keyof typeof labels] || tip;
   };
@@ -103,7 +111,7 @@ const PostDetailsPage = () => {
         <div className="container mx-auto px-6">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-            <p className="text-white">Učitava se kampanja...</p>
+            <p className="text-white">Učitava se objava...</p>
           </div>
         </div>
       </div>
@@ -116,13 +124,13 @@ const PostDetailsPage = () => {
         <div className="container mx-auto px-6">
           <div className="text-center">
             <Scroll className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-300 text-lg mb-2">Kampanja nije pronađena</p>
+            <p className="text-gray-300 text-lg mb-2">Objava nije pronađena</p>
             <p className="text-gray-400 mb-6">{error}</p>
             <Link
               to="/posts"
               className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-lg font-semibold transition-colors"
             >
-              Nazad na kampanje
+              Nazad na objave
             </Link>
           </div>
         </div>
@@ -139,7 +147,7 @@ const PostDetailsPage = () => {
             className="inline-flex items-center text-yellow-400 hover:text-yellow-300 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Nazad na kampanje
+            Nazad na objave
           </Link>
         </div>
 
@@ -153,9 +161,11 @@ const PostDetailsPage = () => {
                     <span className="text-gray-300 font-medium">
                       {getTypeLabel(post.tip)}
                     </span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusBadge(post.status)}`}>
-                      {getStatusLabel(post.status)}
-                    </span>
+                    {post.status && (
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusBadge(post.status)}`}>
+                        {getStatusLabel(post.status)}
+                      </span>
+                    )}
                   </div>
                   <h1 className="text-4xl font-bold text-white">
                     {post.naslov}
@@ -166,7 +176,7 @@ const PostDetailsPage = () => {
               {canEditOrDelete && (
                 <div className="flex items-center gap-2">
                   <Link
-                    to={`/admin/posts/${post._id}/edit`}
+                    to={`/posts/${post._id}/edit`}
                     className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold flex items-center transition-colors"
                   >
                     <Edit className="w-4 h-4 mr-2" />
@@ -186,7 +196,9 @@ const PostDetailsPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
                 <div className="bg-white/5 rounded-lg p-6 mb-6">
-                  <h2 className="text-xl font-semibold text-white mb-4">Opis kampanje</h2>
+                  <h2 className="text-xl font-semibold text-white mb-4">
+                    {post.level && post.igraci ? 'Opis kampanje' : 'Sadržaj objave'}
+                  </h2>
                   <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
                     {post.tekst}
                   </div>
@@ -229,7 +241,7 @@ const PostDetailsPage = () => {
                 <div className="bg-white/5 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
                     <User className="w-5 h-5 mr-2" />
-                    Dungeon Master
+                    {post.level && post.igraci ? 'Dungeon Master' : 'Autor'}
                   </h3>
                   <div className="text-gray-300">
                     <p className="font-medium">{post.autor.ime} {post.autor.prezime}</p>
@@ -238,27 +250,33 @@ const PostDetailsPage = () => {
                 </div>
 
                 <div className="bg-white/5 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-white mb-4">Detalji kampanje</h3>
+                  <h3 className="text-lg font-semibold text-white mb-4">
+                    {post.level && post.igraci ? 'Detalji kampanje' : 'Detalji objave'}
+                  </h3>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-400 flex items-center">
-                        <Shield className="w-4 h-4 mr-2" />
-                        Nivo
-                      </span>
-                      <span className="text-white font-medium">
-                        {post.level.min} - {post.level.max}
-                      </span>
-                    </div>
+                    {post.level && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-400 flex items-center">
+                          <Shield className="w-4 h-4 mr-2" />
+                          Nivo
+                        </span>
+                        <span className="text-white font-medium">
+                          {post.level.min} - {post.level.max}
+                        </span>
+                      </div>
+                    )}
 
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-400 flex items-center">
-                        <Users className="w-4 h-4 mr-2" />
-                        Igrači
-                      </span>
-                      <span className="text-white font-medium">
-                        {post.igraci.min} - {post.igraci.max}
-                      </span>
-                    </div>
+                    {post.igraci && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-400 flex items-center">
+                          <Users className="w-4 h-4 mr-2" />
+                          Igrači
+                        </span>
+                        <span className="text-white font-medium">
+                          {post.igraci.min} - {post.igraci.max}
+                        </span>
+                      </div>
+                    )}
 
                     {post.lokacija && (
                       <div className="flex items-center justify-between">
@@ -297,6 +315,11 @@ const PostDetailsPage = () => {
               </div>
             </div>
           </div>
+
+          {}
+          <div className="mt-8">
+            <Comments postId={post._id} commentsLocked={post.zakljucaniKomentari} />
+          </div>
         </div>
 
         {showDeleteModal && (
@@ -306,7 +329,7 @@ const PostDetailsPage = () => {
                 Potvrdite brisanje
               </h3>
               <p className="text-gray-600 mb-6">
-                Da li ste sigurni da želite obrisati ovu kampanju? Ova akcija se ne može poništiti.
+                Da li ste sigurni da želite obrisati ovu objavu? Ova akcija se ne može poništiti.
               </p>
               <div className="flex justify-end gap-3">
                 <button

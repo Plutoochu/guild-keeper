@@ -4,20 +4,22 @@ export interface IPost extends Document {
   naslov: string;
   tekst: string;
   autor: Schema.Types.ObjectId;
-  tip: 'campaign' | 'adventure' | 'tavern-tale' | 'quest';
+  tip: 'campaign' | 'adventure' | 'tavern-tale' | 'quest' | 'discussion' | 'announcement';
   kategorije: string[];
   tagovi: string[];
-  level: {
+  level?: {
     min: number;
     max: number;
   };
-  igraci: {
+  igraci?: {
     min: number;
     max: number;
   };
-  lokacija: string;
-  status: 'planning' | 'active' | 'completed' | 'on-hold';
+  lokacija?: string;
+  status?: 'planning' | 'active' | 'completed' | 'on-hold';
   javno: boolean;
+  zakljucaniKomentari: boolean;
+  prikvacen: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,8 +44,8 @@ const PostSchema = new Schema<IPost>({
   },
   tip: {
     type: String,
-    enum: ['campaign', 'adventure', 'tavern-tale', 'quest'],
-    default: 'campaign',
+    enum: ['campaign', 'adventure', 'tavern-tale', 'quest', 'discussion', 'announcement'],
+    default: 'discussion',
     required: true
   },
   kategorije: {
@@ -71,13 +73,15 @@ const PostSchema = new Schema<IPost>({
       type: Number,
       min: 1,
       max: 20,
-      default: 1
+      default: 1,
+      required: false
     },
     max: {
       type: Number,
       min: 1,
       max: 20,
-      default: 20
+      default: 20,
+      required: false
     }
   },
   igraci: {
@@ -85,25 +89,39 @@ const PostSchema = new Schema<IPost>({
       type: Number,
       min: 1,
       max: 10,
-      default: 2
+      default: 2,
+      required: false
     },
     max: {
       type: Number,
       min: 1,
       max: 10,
-      default: 6
+      default: 6,
+      required: false
     }
   },
   lokacija: {
     type: String,
     trim: true,
     maxlength: [100, 'Lokacija ne može biti duža od 100 karaktera'],
-    default: ''
+    default: '',
+    required: false
   },
   status: {
     type: String,
     enum: ['planning', 'active', 'completed', 'on-hold'],
-    default: 'planning'
+    default: 'planning',
+    required: false
+  },
+  zakljucaniKomentari: {
+    type: Boolean,
+    default: false,
+    required: true
+  },
+  prikvacen: {
+    type: Boolean,
+    default: false,
+    required: true
   },
   javno: {
     type: Boolean,
@@ -123,10 +141,10 @@ PostSchema.pre(/^find/, function(this: any) {
 
 
 PostSchema.pre('save', function(this: IPost) {
-  if (this.level.max < this.level.min) {
+  if (this.level && this.level.max < this.level.min) {
     this.level.max = this.level.min;
   }
-  if (this.igraci.max < this.igraci.min) {
+  if (this.igraci && this.igraci.max < this.igraci.min) {
     this.igraci.max = this.igraci.min;
   }
 });
