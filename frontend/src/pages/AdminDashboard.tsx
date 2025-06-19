@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { UserPlus } from 'lucide-react';
+import AddUserModal from '../components/AddUserModal';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -11,6 +13,7 @@ const AdminDashboard = () => {
     aktivniPostovi: 0
   });
   const [loading, setLoading] = useState(true);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
 
   
   const fetchStats = async () => {
@@ -92,6 +95,17 @@ const AdminDashboard = () => {
           <p className="text-xl text-purple-200">
             Vladajte svojim digitalnim carstvom
           </p>
+          
+          {}
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={() => setShowAddUserModal(true)}
+              className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
+              <UserPlus size={20} />
+              Dodaj novog korisnika
+            </button>
+          </div>
         </div>
 
         {}
@@ -167,9 +181,11 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-
-
-
+        <AddUserModal
+          isOpen={showAddUserModal}
+          onClose={() => setShowAddUserModal(false)}
+          onUserAdded={fetchStats}
+        />
       </div>
     </div>
   );

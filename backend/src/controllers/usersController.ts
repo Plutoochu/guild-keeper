@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import User from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
+import { deleteProfileImage } from '../middleware/upload';
+import path from 'path';
 
 const DEFAULT_PAGE_SIZE = 10;
 const MAX_PAGE_SIZE = 50;
@@ -492,6 +494,126 @@ export const bulkUserActions = async (req: AuthRequest, res: Response): Promise<
     res.status(500).json({
       success: false,
       message: 'Greška pri izvršavanju bulk operacije'
+    });
+  }
+};
+
+export const uploadUserProfileImage = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.params.id || req.user?.id;
+    const currentUser = req.user!;
+
+    if (!userId) {
+      res.status(400).json({
+        success: false,
+        message: 'ID korisnika je obavezan'
+      });
+      return;
+    }
+
+    if (userId !== currentUser.id && currentUser.tip !== 'admin') {
+      res.status(403).json({
+        success: false,
+        message: 'Nemate dozvolu za mijenjanje slike ovog korisnika'
+      });
+      return;
+    }
+
+    if (!req.file) {
+      res.status(400).json({
+        success: false,
+        message: 'Slika je obavezna'
+      });
+      return;
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'Korisnik nije pronađen'
+      });
+      return;
+    }
+
+    if (user.slika) {
+      deleteProfileImage(path.basename(user.slika));
+    }
+
+    const imageUrl = `/uploads/profiles/${req.file.filename}`;
+    
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { slika: imageUrl },
+      { new: true }
+    ).select('-password');
+
+    res.json({
+      success: true,
+      message: 'Slika profila uspješno ažurirana',
+      data: updatedUser
+    });
+
+  } catch (error) {
+    console.error('Greška pri upload slike:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Greška pri upload slike'
+    });
+  }
+};
+
+export const deleteUserProfileImage = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.params.id || req.user?.id;
+    const currentUser = req.user!;
+
+    if (!userId) {
+      res.status(400).json({
+        success: false,
+        message: 'ID korisnika je obavezan'
+      });
+      return;
+    }
+
+    if (userId !== currentUser.id && currentUser.tip !== 'admin') {
+      res.status(403).json({
+        success: false,
+        message: 'Nemate dozvolu za brisanje slike ovog korisnika'
+      });
+      return;
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'Korisnik nije pronađen'
+      });
+      return;
+    }
+
+    if (user.slika) {
+      deleteProfileImage(path.basename(user.slika));
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { slika: null },
+      { new: true }
+    ).select('-password');
+
+    res.json({
+      success: true,
+      message: 'Slika profila uspješno obrisana',
+      data: updatedUser
+    });
+
+  } catch (error) {
+    console.error('Greška pri brisanju slike:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Greška pri brisanju slike'
     });
   }
 }; 

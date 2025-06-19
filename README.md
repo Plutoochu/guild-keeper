@@ -1,20 +1,59 @@
-# User Management System
+# GuildKeeper
+
+## Setup
+
+```bash
+# Kloniraj repo
+git clone <repo-url>
+cd eldar-muratovic-praksa
+
+# Backend
+cd backend
+npm install
+npm run dev
+
+# Frontend
+cd frontend
+npm install
+npm run dev
+```
+
+## Portovi
+
+- Backend: http://localhost:5000
+- Frontend: http://localhost:3000 
+- Promijeni u .env fajlovima ako je potrebno 
 
 ## Tehnologije
 
 **Frontend:**
 - React 18 sa TypeScript
-- Tailwind CSS
-- React Router
-- Axios
-- React Hook Form
+- Vite - build tool i dev server
+- Tailwind CSS - utility-first CSS framework
+- React Router Dom - client-side routing
+- Axios - HTTP client
+- React Hook Form - form validation
+- Yup - schema validation
+- React Hot Toast - notifications
+- Lucide React - icon library
 
 **Backend:**
 - Node.js sa Express.js
-- MongoDB sa Mongoose
-- JWT autentifikacija
-- bcrypt za hash-ovanje password-a
 - TypeScript
+- MongoDB sa Mongoose ODM
+- JWT (jsonwebtoken) - autentifikacija
+- bcryptjs - hash-ovanje password-a
+- Multer - file upload middleware
+- Helmet - security middleware
+- CORS - cross-origin resource sharing
+- Express Rate Limit - rate limiting
+- Express Validator - request validation
+- Dotenv - environment variables
+
+**Development Tools:**
+- ESLint - code linting
+- Nodemon - auto-restart development server
+- ts-node - TypeScript execution
 
 ## Implementirano
 
@@ -43,32 +82,3 @@
 - User model sa validacijom
 - Post model sa populacijom autora
 - Seed podaci za testiranje
-
-
-
-
-## Plan naredne implementacije
-
-**Autentifikacija:**
-- Registracija i login forme
-- JWT token handling
-- Protected routes
-- Password validacija
-
-**Admin panel:**
-- CRUD operacije za korisnike
-- Tabela sa pretragom i sortiranjem
-- User management interface
-- Admin dashboard
-
-**Korisničke funkcionalnosti:**
-- Profil stranica sa edit opcijama
-- Upload profilnih slika
-- Pregled javnih postova
-
-**Bonus funkcionalnosti:**
-- Postavljanje objava i uređivanje (admin)
-- File upload sistem
-- Email notifikacije
-- Deployment na Vercel
-- DnD Theme (ako bude vremena)

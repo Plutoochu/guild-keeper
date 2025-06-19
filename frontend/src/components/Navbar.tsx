@@ -104,15 +104,23 @@ const Navbar = () => {
                   onClick={toggleProfileDropdown}
                   className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <User className="h-4 w-4 text-white" />
-                  </div>
+                  {user?.slika ? (
+                    <img
+                      src={`http://localhost:5000${user.slika}`}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full object-cover border-2 border-blue-300"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-white" />
+                    </div>
+                  )}
                   <div className="hidden md:block text-left">
                     <div className="text-sm font-medium text-gray-900">
                       {user?.ime} {user?.prezime || ''}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {isAdmin ? 'Administrator' : 'Korisnik'}
+                      {isAdmin ? 'Dungeon Master' : 'Adventurer'}
                     </div>
                   </div>
                 </button>
