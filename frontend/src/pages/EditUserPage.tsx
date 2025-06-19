@@ -1,14 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { User, ShieldCheck, Save, Pen, Eye, EyeOff, Camera, Trash2 } from 'lucide-react';
+import { User, ShieldCheck, Save, Pen, Camera, Trash2, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { profileSchema, ProfileFormData } from '../validators/profileValidator';
+import { User as UserType } from '../types';
 
-const ProfilePage = () => {
-  const { user, updateUser, isLoading } = useAuth();
+const EditUserPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
+  const [targetUser, setTargetUser] = useState<UserType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -19,46 +25,79 @@ const ProfilePage = () => {
     handleSubmit,
     formState: { errors },
     reset,
-    watch
   } = useForm<ProfileFormData>({
     resolver: yupResolver(profileSchema) as any,
-    defaultValues: {
-      ime: user?.ime || '',
-      prezime: user?.prezime || undefined,
-      email: user?.email || '',
-      datumRodjenja: user?.datumRodjenja ? new Date(user.datumRodjenja).toISOString().split('T')[0] : '',
-      spol: (user?.spol as 'muški' | 'ženski' | 'ostalo' | undefined) || undefined
-    }
   });
 
+  
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!id) return;
+      
+      try {
+        setIsLoading(true);
+        const response = await axios.get(`/users/${id}`);
+        
+        if (response.data.success) {
+          const userData = response.data.data;
+          setTargetUser(userData);
+          
+          
+          reset({
+            ime: userData.ime || '',
+            prezime: userData.prezime || undefined,
+            email: userData.email || '',
+            datumRodjenja: userData.datumRodjenja ? new Date(userData.datumRodjenja).toISOString().split('T')[0] : '',
+            spol: (userData.spol as 'muški' | 'ženski' | 'ostalo' | undefined) || undefined
+          });
+        }
+      } catch (error) {
+        console.error('Greška pri učitavanju korisnika:', error);
+        toast.error('Greška pri učitavanju korisnika');
+        navigate('/users');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [id, navigate, reset]);
+
   const onSubmit = async (data: ProfileFormData) => {
+    if (!targetUser) return;
+    
     setIsSubmitting(true);
     try {
-      await updateUser(data);
+      const response = await axios.put(`/users/${targetUser._id}`, data);
       
-      setIsEditing(false);
-      toast.success('Profil je uspješno ažuriran! 🎉');
+      if (response.data.success) {
+        setTargetUser(response.data.data);
+        setIsEditing(false);
+        toast.success('Profil korisnika uspješno ažuriran! 🎉');
+      }
     } catch (error: any) {
-      toast.error(error.message || 'Greška pri ažuriranju profila');
+      toast.error(error.response?.data?.message || 'Greška pri ažuriranju profila');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleCancel = () => {
+    if (!targetUser) return;
+    
     reset({
-      ime: user?.ime || '',
-      prezime: user?.prezime || undefined,
-      email: user?.email || '',
-      datumRodjenja: user?.datumRodjenja ? new Date(user.datumRodjenja).toISOString().split('T')[0] : '',
-      spol: (user?.spol as 'muški' | 'ženski' | 'ostalo' | undefined) || undefined
+      ime: targetUser.ime || '',
+      prezime: targetUser.prezime || undefined,
+      email: targetUser.email || '',
+      datumRodjenja: targetUser.datumRodjenja ? new Date(targetUser.datumRodjenja).toISOString().split('T')[0] : '',
+      spol: (targetUser.spol as 'muški' | 'ženski' | 'ostalo' | undefined) || undefined
     });
     setIsEditing(false);
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || !targetUser) return;
 
     if (!file.type.startsWith('image/')) {
       toast.error('Molimo odaberite sliku fajl');
@@ -76,7 +115,7 @@ const ProfilePage = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('/users/profile-image', formData, {
+      const response = await axios.post(`/users/${targetUser._id}/profile-image`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
@@ -84,7 +123,7 @@ const ProfilePage = () => {
       });
 
       if (response.data.success) {
-        await updateUser(response.data.data);
+        setTargetUser(response.data.data);
         toast.success('Slika profila uspješno ažurirana! 📸');
       }
     } catch (error: any) {
@@ -98,19 +137,19 @@ const ProfilePage = () => {
   };
 
   const handleImageDelete = async () => {
-    if (!user?.slika) return;
+    if (!targetUser?.slika) return;
 
     setIsUploadingImage(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.delete('/users/profile-image', {
+      const response = await axios.delete(`/users/${targetUser._id}/profile-image`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
 
       if (response.data.success) {
-        await updateUser(response.data.data);
+        setTargetUser(response.data.data);
         toast.success('Slika profila obrisana! 🗑️');
       }
     } catch (error: any) {
@@ -129,7 +168,25 @@ const ProfilePage = () => {
     });
   };
 
-  if (isLoading || !user) {
+  
+  if (currentUser?.tip !== 'admin') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Nemate dozvolu</h1>
+          <p className="text-gray-600 mb-4">Samo administratori mogu uređivati profile drugih korisnika.</p>
+          <button
+            onClick={() => navigate('/users')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Nazad na listu korisnika
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading || !targetUser) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-500"></div>
@@ -141,12 +198,23 @@ const ProfilePage = () => {
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 py-8">
       <div className="container mx-auto px-6 max-w-4xl">
         {}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2 flex items-center justify-center gap-3">
-            <User className="text-amber-600" size={36} />
-            Profil
-          </h1>
-          <p className="text-gray-600">Upravljaj svojim podacima u GuildKeeper sistemu</p>
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => navigate(`/users/${targetUser._id}`)}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            <ArrowLeft size={20} />
+            Nazad na profil
+          </button>
+          
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
+              <User className="text-amber-600" size={32} />
+              Uređivanje profila: {targetUser.ime} {targetUser.prezime}
+            </h1>
+          </div>
+          
+          <div></div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -155,9 +223,9 @@ const ProfilePage = () => {
             <div className="bg-white rounded-xl shadow-lg p-6 border border-amber-200">
               <div className="text-center">
                 <div className="relative w-24 h-24 mx-auto mb-4">
-                  {user.slika ? (
+                  {targetUser.slika ? (
                     <img
-                      src={`http://localhost:5000${user.slika}`}
+                      src={`http://localhost:5000${targetUser.slika}`}
                       alt="Profile"
                       className="w-24 h-24 rounded-full object-cover border-4 border-amber-300"
                     />
@@ -181,7 +249,7 @@ const ProfilePage = () => {
                       )}
                     </button>
                     
-                    {user.slika && (
+                    {targetUser.slika && (
                       <button
                         onClick={handleImageDelete}
                         disabled={isUploadingImage}
@@ -202,25 +270,25 @@ const ProfilePage = () => {
                   />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                  {user.ime} {user.prezime}
+                  {targetUser.ime} {targetUser.prezime}
                 </h2>
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  {user.tip === 'admin' ? (
+                  {targetUser.tip === 'admin' ? (
                     <>
                       <ShieldCheck className="text-red-600" size={18} />
                       <span className="text-red-600 font-semibold">Dungeon Master</span>
                     </>
                   ) : (
-                                         <>
-                       <User className="text-blue-600" size={18} />
-                       <span className="text-blue-600 font-semibold">Adventurer</span>
-                     </>
+                    <>
+                      <User className="text-blue-600" size={18} />
+                      <span className="text-blue-600 font-semibold">Adventurer</span>
+                    </>
                   )}
                 </div>
                 <div className="text-sm text-gray-500">
-                  <p>Član od: {formatDate(user.createdAt)}</p>
-                  {user.updatedAt !== user.createdAt && (
-                    <p>Posljednji update: {formatDate(user.updatedAt)}</p>
+                  <p>Član od: {formatDate(targetUser.createdAt)}</p>
+                  {targetUser.updatedAt !== targetUser.createdAt && (
+                    <p>Posljednji update: {formatDate(targetUser.updatedAt)}</p>
                   )}
                 </div>
               </div>
@@ -252,7 +320,7 @@ const ProfilePage = () => {
                           Ime
                         </label>
                         <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">
-                          {user.ime}
+                          {targetUser.ime}
                         </p>
                       </div>
                       
@@ -261,7 +329,7 @@ const ProfilePage = () => {
                           Prezime
                         </label>
                         <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">
-                          {user.prezime || 'Nije uneseno'}
+                          {targetUser.prezime || 'Nije uneseno'}
                         </p>
                       </div>
                     </div>
@@ -271,7 +339,7 @@ const ProfilePage = () => {
                         Email adresa
                       </label>
                       <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">
-                        {user.email}
+                        {targetUser.email}
                       </p>
                     </div>
 
@@ -281,7 +349,7 @@ const ProfilePage = () => {
                           Datum rođenja
                         </label>
                         <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">
-                          {formatDate(user.datumRodjenja)}
+                          {formatDate(targetUser.datumRodjenja)}
                         </p>
                       </div>
                       
@@ -290,7 +358,7 @@ const ProfilePage = () => {
                           Spol
                         </label>
                         <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">
-                          {user.spol ? user.spol.charAt(0).toUpperCase() + user.spol.slice(1) : 'Nije uneseno'}
+                          {targetUser.spol ? targetUser.spol.charAt(0).toUpperCase() + targetUser.spol.slice(1) : 'Nije uneseno'}
                         </p>
                       </div>
                     </div>
@@ -422,4 +490,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default EditUserPage; 

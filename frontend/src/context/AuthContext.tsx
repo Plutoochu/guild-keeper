@@ -1,19 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
-
-// Types
-interface User {
-  _id: string;
-  ime: string;
-  prezime?: string;
-  email: string;
-  datumRodjenja: string;
-  spol?: 'muški' | 'ženski' | 'ostalo';
-  tip: 'admin' | 'user';
-  profilnaSlika?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
@@ -40,13 +27,13 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Create context
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// API base URL
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-// Configure axios defaults
+
 axios.defaults.baseURL = API_URL;
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -54,7 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [isLoading, setIsLoading] = useState(true);
 
-  // Set axios authorization header when token changes
+  
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -63,7 +50,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [token]);
 
-  // Check if user is authenticated on app load
+ 
   useEffect(() => {
     const checkAuth = async () => {
       const savedToken = localStorage.getItem('token');
@@ -72,7 +59,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setToken(savedToken);
           axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
           
-          // Verify token and get user data
+          
           const response = await axios.get('/auth/me');
           setUser(response.data.user);
         } catch (error) {
@@ -151,7 +138,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-// Custom hook to use auth context
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {

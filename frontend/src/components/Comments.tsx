@@ -148,8 +148,18 @@ const Comments: React.FC<CommentsProps> = ({ postId, commentsLocked }) => {
       {user && !commentsLocked && (
         <form onSubmit={handleSubmitComment} className="mb-6">
           <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center flex-shrink-0">
-              <User className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+              {(user as any)?.slika ? (
+                <img
+                  src={`http://localhost:5000${(user as any).slika}`}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+              )}
             </div>
             <div className="flex-1">
               <textarea
@@ -215,8 +225,18 @@ const Comments: React.FC<CommentsProps> = ({ postId, commentsLocked }) => {
           comments.map((comment) => (
             <div key={comment._id} className="bg-white/5 rounded-lg p-4">
               <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center flex-shrink-0">
-                  <User className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+                  {(comment.autor as any)?.slika ? (
+                    <img
+                      src={`http://localhost:5000${(comment.autor as any).slika}`}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">

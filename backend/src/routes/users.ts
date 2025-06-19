@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authenticate, requireAdmin } from '../middleware/auth';
+import { uploadProfileImage } from '../middleware/upload';
 import {
   getAllUsers,
   getUserById,
@@ -8,7 +9,9 @@ import {
   deleteUser,
   toggleUserRole,
   toggleUserStatus,
-  bulkUserActions
+  bulkUserActions,
+  uploadUserProfileImage,
+  deleteUserProfileImage
 } from '../controllers/usersController';
 
 const router = Router();
@@ -36,5 +39,13 @@ router.put('/:id/toggle-status', authenticate, requireAdmin, toggleUserStatus);
 
 
 router.post('/bulk-actions', authenticate, requireAdmin, bulkUserActions);
+
+router.post('/profile-image', authenticate, uploadProfileImage, uploadUserProfileImage);
+
+router.post('/:id/profile-image', authenticate, uploadProfileImage, uploadUserProfileImage);
+
+router.delete('/profile-image', authenticate, deleteUserProfileImage);
+
+router.delete('/:id/profile-image', authenticate, deleteUserProfileImage);
 
 export default router; 

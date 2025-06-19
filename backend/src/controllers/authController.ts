@@ -43,6 +43,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    const userCount = await User.countDocuments();
+    const userType = userCount === 0 ? 'admin' : 'user';
+
     const user = new User({
       ime,
       prezime,
@@ -50,7 +53,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       password,
       datumRodjenja,
       spol,
-      tip: 'user'
+      tip: userType
     });
 
     await user.save();

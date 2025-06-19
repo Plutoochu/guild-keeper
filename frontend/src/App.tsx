@@ -17,6 +17,7 @@ import PostsPage from './pages/PostsPage';
 import PostDetailsPage from './pages/PostDetailsPage';
 import CreatePostPage from './pages/CreatePostPage';
 import EditPostPage from './pages/EditPostPage';
+import EditUserPage from './pages/EditUserPage';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
               <Route path="admin" element={<AdminDashboard />} />
               <Route path="users" element={<UsersPage />} />
               <Route path="users/:id" element={<UserDetailsPage />} />
+              <Route path="users/:id/edit" element={<EditUserPage />} />
               <Route path="create-post" element={<CreatePostPage />} />
               <Route path="posts/:id/edit" element={<EditPostPage />} />
             </Route>

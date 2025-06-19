@@ -1,16 +1,16 @@
 export interface User {
   _id: string;
   ime: string;
-  prezime: string;
+  prezime?: string;
   email: string;
-  datumRodjenja: Date;
-  spol: 'muški' | 'ženski' | 'ostalo';
+  datumRodjenja: string;
+  spol?: 'muški' | 'ženski' | 'ostalo';
   tip: 'admin' | 'user';
   slika?: string;
   aktivan: boolean;
-  poslednjaPrijava?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  poslednjaPrijava?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Post {

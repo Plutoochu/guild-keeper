@@ -302,7 +302,7 @@ const UserDetailsPage = () => {
           {canEdit && (
             <div className="mt-8 text-center">
               <button
-                onClick={() => navigate(`/profile`)}
+                onClick={() => navigate(currentUser?._id === user._id ? `/profile` : `/users/${user._id}/edit`)}
                 className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
               >
                 ✏️ Uredi profil
