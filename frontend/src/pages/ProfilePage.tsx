@@ -2,41 +2,9 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
 import { User, ShieldCheck, Save, Pen, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-// Validation schema
-const profileSchema = yup.object().shape({
-  ime: yup.string()
-    .min(2, 'Ime mora imati najmanje 2 karaktera')
-    .max(50, 'Ime može imati maksimalno 50 karaktera')
-    .required('Ime je obavezno'),
-  prezime: yup.string()
-    .notRequired()
-    .nullable()
-    .test('prezime-length', 'Prezime mora imati između 2 i 50 karaktera', function(value) {
-      if (!value || value.trim() === '') return true;
-      return value.length >= 2 && value.length <= 50;
-    }),
-  email: yup.string()
-    .email('Neispravna email adresa')
-    .required('Email je obavezan'),
-  datumRodjenja: yup.string()
-    .required('Datum rođenja je obavezan'),
-  spol: yup.string()
-    .notRequired()
-    .nullable()
-    .oneOf(['', 'muški', 'ženski', 'ostalo'], 'Spol mora biti: muški, ženski ili ostalo')
-});
-
-interface ProfileFormData {
-  ime: string;
-  prezime?: string | undefined;
-  email: string;
-  datumRodjenja: string;
-  spol?: 'muški' | 'ženski' | 'ostalo' | undefined;
-}
+import { profileSchema, ProfileFormData } from '../validators/profileValidator';
 
 const ProfilePage = () => {
   const { user, updateUser, isLoading } = useAuth();
@@ -63,13 +31,7 @@ const ProfilePage = () => {
   const onSubmit = async (data: ProfileFormData) => {
     setIsSubmitting(true);
     try {
-      await updateUser({
-        ime: data.ime,
-        prezime: data.prezime || undefined,
-        email: data.email,
-        datumRodjenja: data.datumRodjenja,
-        spol: data.spol || undefined
-      });
+      await updateUser(data);
       
       setIsEditing(false);
       toast.success('Profil je uspješno ažuriran! 🎉');

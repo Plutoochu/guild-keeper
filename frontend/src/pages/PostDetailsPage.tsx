@@ -197,7 +197,7 @@ const PostDetailsPage = () => {
               <div className="lg:col-span-2">
                 <div className="bg-white/5 rounded-lg p-6 mb-6">
                   <h2 className="text-xl font-semibold text-white mb-4">
-                    {post.level && post.igraci ? 'Opis kampanje' : 'Sadržaj objave'}
+                    {post.level && post.igraci && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) ? 'Opis kampanje' : 'Sadržaj objave'}
                   </h2>
                   <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
                     {post.tekst}
@@ -241,7 +241,7 @@ const PostDetailsPage = () => {
                 <div className="bg-white/5 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
                     <User className="w-5 h-5 mr-2" />
-                    {post.level && post.igraci ? 'Dungeon Master' : 'Autor'}
+                    {post.level && post.igraci && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) ? 'Dungeon Master' : 'Autor'}
                   </h3>
                   <div className="text-gray-300">
                     <p className="font-medium">{post.autor.ime} {post.autor.prezime}</p>
@@ -251,10 +251,10 @@ const PostDetailsPage = () => {
 
                 <div className="bg-white/5 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-white mb-4">
-                    {post.level && post.igraci ? 'Detalji kampanje' : 'Detalji objave'}
+                    {post.level && post.igraci && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) ? 'Detalji kampanje' : 'Detalji objave'}
                   </h3>
                   <div className="space-y-4">
-                    {post.level && (
+                    {post.level && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) && (
                       <div className="flex items-center justify-between">
                         <span className="text-gray-400 flex items-center">
                           <Shield className="w-4 h-4 mr-2" />
@@ -266,7 +266,7 @@ const PostDetailsPage = () => {
                       </div>
                     )}
 
-                    {post.igraci && (
+                    {post.igraci && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) && (
                       <div className="flex items-center justify-between">
                         <span className="text-gray-400 flex items-center">
                           <Users className="w-4 h-4 mr-2" />

@@ -276,7 +276,7 @@ const PostsPage = () => {
               </p>
 
               {}
-              {post.level && post.igraci && (
+              {post.level && post.igraci && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) && (
                 <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
                   <span className="flex items-center">
                     <Shield className="w-4 h-4 mr-1" />
