@@ -19,8 +19,8 @@ export interface Post {
   tekst: string;
   autor: User;
   tip: 'campaign' | 'adventure' | 'tavern-tale' | 'quest' | 'discussion' | 'announcement';
-  kategorije: string[];
-  tagovi: string[];
+  kategorije: Category[];
+  tagovi: Tag[];
   level?: {
     min: number;
     max: number;
@@ -45,6 +45,27 @@ export interface Comment {
   post: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface Category {
+  _id: string;
+  naziv: string;
+  opis?: string;
+  boja: string;
+  ikona: string;
+  aktivna: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Tag {
+  _id: string;
+  naziv: string;
+  opis?: string;
+  boja: string;
+  aktivna: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthState {

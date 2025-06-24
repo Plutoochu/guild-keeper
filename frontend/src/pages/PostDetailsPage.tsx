@@ -204,7 +204,7 @@ const PostDetailsPage = () => {
                   </div>
                 </div>
 
-                {post.kategorije.length > 0 && (
+                {post.kategorije && post.kategorije.length > 0 && (
                   <div className="bg-white/5 rounded-lg p-6 mb-6">
                     <h3 className="text-lg font-semibold text-white mb-4">Kategorije</h3>
                     <div className="flex flex-wrap gap-2">
@@ -213,14 +213,14 @@ const PostDetailsPage = () => {
                           key={index}
                           className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-sm"
                         >
-                          {kategorija}
+                          {typeof kategorija === 'string' ? kategorija : kategorija.naziv}
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {post.tagovi.length > 0 && (
+                {post.tagovi && post.tagovi.length > 0 && (
                   <div className="bg-white/5 rounded-lg p-6">
                     <h3 className="text-lg font-semibold text-white mb-4">Tagovi</h3>
                     <div className="flex flex-wrap gap-2">
@@ -229,7 +229,7 @@ const PostDetailsPage = () => {
                           key={index}
                           className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm"
                         >
-                          #{tag}
+                          #{typeof tag === 'string' ? tag : tag.naziv}
                         </span>
                       ))}
                     </div>

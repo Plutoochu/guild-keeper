@@ -2,16 +2,19 @@ import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { User, ShieldCheck, Save, Pen, Eye, EyeOff, Camera, Trash2 } from 'lucide-react';
+import { User, ShieldCheck, Save, Pen, Eye, EyeOff, Camera, Trash2, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { profileSchema, ProfileFormData } from '../validators/profileValidator';
+import { profileSchema } from '../validators/profileValidator';
+import { ProfileFormData } from '../types/profileTypes';
 
 const ProfilePage = () => {
-  const { user, updateUser, isLoading } = useAuth();
+  const { user, updateUser, logout, isLoading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -75,11 +78,9 @@ const ProfilePage = () => {
     formData.append('slika', file);
 
     try {
-      const token = localStorage.getItem('token');
       const response = await axios.post('/users/profile-image', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`
+          'Content-Type': 'multipart/form-data'
         }
       });
 
@@ -102,12 +103,7 @@ const ProfilePage = () => {
 
     setIsUploadingImage(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.delete('/users/profile-image', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await axios.delete('/users/profile-image');
 
       if (response.data.success) {
         await updateUser(response.data.data);
@@ -129,6 +125,22 @@ const ProfilePage = () => {
     });
   };
 
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const response = await axios.delete('/users/me/account');
+      if (response.data.success) {
+        toast.success('Account je uspješno obrisan');
+        logout();
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Greška pri brisanju account-a');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
+
   if (isLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -138,9 +150,9 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 py-8">
+          <div className="min-h-screen bg-white py-8">
       <div className="container mx-auto px-6 max-w-4xl">
-        {}
+        {/* Naslov profil stranice */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2 flex items-center justify-center gap-3">
             <User className="text-amber-600" size={36} />
@@ -150,9 +162,9 @@ const ProfilePage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {}
+          {/* Karta sa profilnom slikom */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-amber-200">
+                          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 h-fit">
               <div className="text-center">
                 <div className="relative w-24 h-24 mx-auto mb-4">
                   {user.slika ? (
@@ -227,9 +239,9 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {}
+          {/* Detalji profila i forma za uređivanje */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-lg border border-amber-200">
+                          <div className="bg-white rounded-xl shadow-lg border border-gray-200">
               <div className="p-6 border-b border-gray-200 flex items-center justify-between">
                 <h3 className="text-xl font-semibold text-gray-800">Detalji Profila</h3>
                 {!isEditing && (
@@ -417,6 +429,60 @@ const ProfilePage = () => {
             </div>
           </div>
         </div>
+
+        {/* Opasna zona - brisanje računa */}
+        <div className="mt-8 bg-red-50 border border-red-200 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <AlertTriangle className="text-red-600" size={24} />
+            <h3 className="text-xl font-semibold text-red-800">Opasna zona</h3>
+          </div>
+          <p className="text-red-700 mb-4">
+            Brisanje account-a je nepovratna akcija. Svi vaši podaci, postovi i komentari će biti trajno obrisani.
+          </p>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            <Trash2 size={16} />
+            Obriši account
+          </button>
+        </div>
+
+        {/* Modal za potvrdu brisanja računa */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <AlertTriangle className="text-red-600" size={24} />
+                <h3 className="text-xl font-bold text-gray-800">Potvrdi brisanje</h3>
+              </div>
+              <p className="text-gray-600 mb-6">
+                Da li ste sigurni da želite da obrišete svoj account? Ova akcija je nepovratna i svi vaši podaci će biti trajno obrisani.
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isDeleting ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  ) : (
+                    <Trash2 size={16} />
+                  )}
+                  {isDeleting ? 'Brišem...' : 'Da, obriši'}
+                </button>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={isDeleting}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Odustani
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

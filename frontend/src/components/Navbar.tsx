@@ -10,7 +10,8 @@ import {
   X, 
   Shield,
   Home,
-  BookOpen
+  BookOpen,
+  Swords
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -52,7 +53,7 @@ const Navbar = () => {
     <Link
       to={to}
       onClick={onClick}
-      className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition-colors"
+      className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-yellow-300 hover:bg-white/10 transition-colors"
     >
       {Icon && <Icon className="h-4 w-4" />}
       {children}
@@ -60,15 +61,15 @@ const Navbar = () => {
   );
 
   return (
-    <header className="bg-white shadow border-b sticky top-0 z-50">
+    <header className="bg-gradient-to-r from-slate-800 via-purple-900 to-slate-800 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Shield className="h-5 w-5 text-white" />
+              <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                <Swords className="h-5 w-5 text-slate-900" />
               </div>
-              <h1 className="text-xl font-bold text-gray-900">GuildKeeper</h1>
+              <h1 className="text-xl font-bold text-white">GuildKeeper</h1>
             </Link>
 
             <nav className="hidden md:flex items-center gap-1">
@@ -87,13 +88,13 @@ const Navbar = () => {
               <div className="hidden md:flex items-center gap-2">
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-200 hover:text-yellow-300 transition-colors"
                 >
                   Prijava
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-yellow-500 text-slate-900 text-sm font-medium rounded-md hover:bg-yellow-400 transition-colors"
                 >
                   Registracija
                 </Link>
@@ -102,24 +103,24 @@ const Navbar = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={toggleProfileDropdown}
-                  className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-white/10 transition-colors"
                 >
                   {user?.slika ? (
                     <img
                       src={`http://localhost:5000${user.slika}`}
                       alt="Profile"
-                      className="w-8 h-8 rounded-full object-cover border-2 border-blue-300"
+                      className="w-8 h-8 rounded-full object-cover border-2 border-yellow-400"
                     />
                   ) : (
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                      <User className="h-4 w-4 text-white" />
+                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-slate-900" />
                     </div>
                   )}
                   <div className="hidden md:block text-left">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-white">
                       {user?.ime} {user?.prezime || ''}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-300">
                       {isAdmin ? 'Dungeon Master' : 'Adventurer'}
                     </div>
                   </div>
@@ -150,7 +151,7 @@ const Navbar = () => {
 
             <button
               onClick={toggleMenu}
-              className="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
+              className="md:hidden p-2 rounded-md hover:bg-white/10 transition-colors text-white"
             >
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -158,7 +159,7 @@ const Navbar = () => {
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden border-t py-4">
+          <div className="md:hidden border-t border-white/20 py-4">
             <nav className="flex flex-col gap-2">
               <NavLink to="/" icon={Home} onClick={() => setIsMenuOpen(false)}>
                 Početna

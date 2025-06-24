@@ -80,6 +80,9 @@ export const getAllPosts = async (req: Request, res: Response): Promise<void> =>
     }
 
     const posts = await Post.find(filters)
+      .populate('autor', 'ime prezime email tip')
+      .populate('kategorije', 'naziv boja ikona')
+      .populate('tagovi', 'naziv boja')
       .sort(sort)
       .skip(skip)
       .limit(limit);
@@ -114,7 +117,10 @@ export const getAllPosts = async (req: Request, res: Response): Promise<void> =>
 
 export const getPostById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.id)
+      .populate('autor', 'ime prezime email tip')
+      .populate('kategorije', 'naziv boja ikona')
+      .populate('tagovi', 'naziv boja');
 
     if (!post) {
       res.status(404).json({
@@ -333,7 +339,7 @@ export const getCategories = async (req: Request, res: Response): Promise<void> 
     
     res.json({
       success: true,
-      data: categories.filter(cat => cat && cat.length > 0)
+      data: categories.filter(cat => cat != null)
     });
 
   } catch (error) {
@@ -352,7 +358,7 @@ export const getTags = async (req: Request, res: Response): Promise<void> => {
     
     res.json({
       success: true,
-      data: tags.filter(tag => tag && tag.length > 0)
+      data: tags.filter(tag => tag != null)
     });
 
   } catch (error) {
@@ -373,6 +379,9 @@ export const getMyPosts = async (req: AuthRequest, res: Response): Promise<void>
     const skip = (page - 1) * limit;
 
     const posts = await Post.find({ autor: user.id })
+      .populate('autor', 'ime prezime email tip')
+      .populate('kategorije', 'naziv boja ikona')
+      .populate('tagovi', 'naziv boja')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);

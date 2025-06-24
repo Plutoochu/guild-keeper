@@ -65,12 +65,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose, onUserAdde
   const onSubmit = async (data: AddUserFormData) => {
     setIsSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post('/users', data, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await axios.post('/users', data);
 
       if (response.data.success) {
         toast.success('Korisnik uspješno dodan! 🎉');

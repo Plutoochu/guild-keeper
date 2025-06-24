@@ -162,9 +162,9 @@ const UsersPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-6">
+    <div className="min-h-screen bg-white p-6">
       <div className="max-w-7xl mx-auto">
-        {}
+        {/* Naslov stranice za upravljanje korisnicima */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4">
             ⚔️ Upravljanje Korisnicima
@@ -174,7 +174,7 @@ const UsersPage = () => {
           </p>
         </div>
 
-        {}
+        {/* Statistike korisnika */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
             <div className="text-center">
@@ -202,7 +202,7 @@ const UsersPage = () => {
           </div>
         </div>
 
-        {}
+        {/* Filteri za pretraživanje korisnika */}
         <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
@@ -263,7 +263,7 @@ const UsersPage = () => {
           </div>
         </div>
 
-        {}
+        {/* Bulk akcije za označene korisnike */}
         {selectedUsers.size > 0 && (
           <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 mb-6">
             <div className="flex flex-wrap gap-2 items-center">
@@ -309,7 +309,7 @@ const UsersPage = () => {
           </div>
         )}
 
-        {}
+        {/* Tabela sa korisnicima */}
         <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg overflow-hidden">
           {loading ? (
             <div className="text-center p-8">

@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
+import Post from '../models/Post';
+import Comment from '../models/Comment';
 import { AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
 import { deleteProfileImage } from '../middleware/upload';
@@ -614,6 +616,41 @@ export const deleteUserProfileImage = async (req: AuthRequest, res: Response): P
     res.status(500).json({
       success: false,
       message: 'Greška pri brisanju slike'
+    });
+  }
+};
+
+export const deleteOwnAccount = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const currentUser = req.user!;
+    const user = await User.findById(currentUser.id);
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'Korisnik nije pronađen'
+      });
+      return;
+    }
+
+    if (user.slika) {
+      deleteProfileImage(path.basename(user.slika));
+    }
+
+    await Post.deleteMany({ autor: currentUser.id });
+    await Comment.deleteMany({ autor: currentUser.id });
+    await User.findByIdAndDelete(currentUser.id);
+
+    res.json({
+      success: true,
+      message: 'Account je uspješno obrisan'
+    });
+
+  } catch (error) {
+    console.error('Greška pri brisanju account-a:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Greška pri brisanju account-a'
     });
   }
 }; 
