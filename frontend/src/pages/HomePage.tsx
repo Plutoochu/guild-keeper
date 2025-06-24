@@ -80,11 +80,11 @@ const HomePage = () => {
         {isAdmin && (
           <Link
             to="/admin"
-            className="bg-gradient-to-br from-purple-500 to-purple-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition-all transform hover:scale-105"
+            className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm hover:border-purple-500 hover:bg-purple-50 transition-all"
           >
-            <Shield className="h-8 w-8 mb-3" />
-            <h3 className="text-lg font-semibold mb-2">Admin Panel</h3>
-            <p className="text-purple-100">
+            <Shield className="h-8 w-8 mb-3 text-purple-500" />
+            <h3 className="text-lg font-semibold mb-2 text-gray-800">Admin Panel</h3>
+            <p className="text-gray-600">
               Upravljanje guildom i članovima
             </p>
           </Link>
@@ -92,22 +92,22 @@ const HomePage = () => {
 
         <Link
           to="/posts"
-          className="bg-gradient-to-br from-orange-500 to-orange-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition-all transform hover:scale-105"
+          className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm hover:border-orange-500 hover:bg-orange-50 transition-all"
         >
-          <BookOpen className="h-8 w-8 mb-3" />
-          <h3 className="text-lg font-semibold mb-2">Objave i avanture</h3>
-          <p className="text-orange-100">
+          <BookOpen className="h-8 w-8 mb-3 text-orange-500" />
+          <h3 className="text-lg font-semibold mb-2 text-gray-800">Objave i avanture</h3>
+          <p className="text-gray-600">
             Pregledajte najnovije objave
           </p>
         </Link>
 
         <Link
           to="/profile"
-          className="bg-gradient-to-br from-green-500 to-green-700 text-white p-6 rounded-lg shadow hover:shadow-lg transition-all transform hover:scale-105"
+          className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm hover:border-green-500 hover:bg-green-50 transition-all"
         >
-          <Settings className="h-8 w-8 mb-3" />
-          <h3 className="text-lg font-semibold mb-2">Moj profil</h3>
-          <p className="text-green-100">
+          <Settings className="h-8 w-8 mb-3 text-green-500" />
+          <h3 className="text-lg font-semibold mb-2 text-gray-800">Moj profil</h3>
+          <p className="text-gray-600">
             Uredite svoje korisničke podatke
           </p>
         </Link>

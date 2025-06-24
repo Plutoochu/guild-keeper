@@ -126,11 +126,11 @@ const PostsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 py-8">
+      <div className="min-h-screen bg-white py-8">
         <div className="container mx-auto px-6">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-            <p className="text-white">Učitavaju se kampanje...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-800">Učitavaju se kampanje...</p>
           </div>
         </div>
       </div>
@@ -138,15 +138,15 @@ const PostsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="container mx-auto px-6">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2 flex items-center">
-              <FileText className="w-8 h-8 mr-3 text-yellow-400" />
+            <h1 className="text-4xl font-bold text-gray-800 mb-2 flex items-center">
+              <FileText className="w-8 h-8 mr-3 text-blue-600" />
               Objave i Kampanje
             </h1>
-            <p className="text-blue-200">Istražite diskusije, objave i epske D&D avanture</p>
+            <p className="text-gray-600">Istražite diskusije, objave i epske D&D avanture</p>
           </div>
           
           {user?.tip === 'admin' && (
@@ -160,7 +160,8 @@ const PostsPage = () => {
           )}
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-8">
+        {/* Pretraga i filteri */}
+        <div className="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200">
           <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-7 gap-4">
             <div className="md:col-span-2">
               <div className="relative">
@@ -170,53 +171,53 @@ const PostsPage = () => {
                   placeholder="Pretražite objave..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
-            {}
+            {/* Dropdown za kategoriju objave */}
             <select
               value={filters.kategorijaObjave}
               onChange={(e) => handleFilterChange('kategorijaObjave', e.target.value)}
-              className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="" className="bg-gray-800 text-white">Sve objave</option>
-              <option value="general" className="bg-gray-800 text-white">Općenite objave</option>
-              <option value="dnd" className="bg-gray-800 text-white">D&D sadržaj</option>
+              <option value="" className="bg-white text-gray-900">Sve objave</option>
+              <option value="general" className="bg-white text-gray-900">Općenite objave</option>
+              <option value="dnd" className="bg-white text-gray-900">D&D sadržaj</option>
             </select>
 
-            {}
+            {/* Tip objave */}
             <select
               value={filters.tip}
               onChange={(e) => handleFilterChange('tip', e.target.value)}
-              className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="" className="bg-gray-800 text-white">Svi tipovi</option>
-              <option value="discussion" className="bg-gray-800 text-white">Diskusija</option>
-              <option value="announcement" className="bg-gray-800 text-white">Objava</option>
-              <option value="campaign" className="bg-gray-800 text-white">Campaign</option>
-              <option value="adventure" className="bg-gray-800 text-white">Adventure</option>
-              <option value="tavern-tale" className="bg-gray-800 text-white">Tavern Priča</option>
-              <option value="quest" className="bg-gray-800 text-white">Quest</option>
+              <option value="" className="bg-white text-gray-900">Svi tipovi</option>
+              <option value="discussion" className="bg-white text-gray-900">Diskusija</option>
+              <option value="announcement" className="bg-white text-gray-900">Objava</option>
+              <option value="campaign" className="bg-white text-gray-900">Campaign</option>
+              <option value="adventure" className="bg-white text-gray-900">Adventure</option>
+              <option value="tavern-tale" className="bg-white text-gray-900">Tavern Priča</option>
+              <option value="quest" className="bg-white text-gray-900">Quest</option>
             </select>
 
-            {}
+            {/* Status kampanje (samo za D&D sadržaj) */}
             {(filters.kategorijaObjave === 'dnd' || filters.kategorijaObjave === '') && (
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              >
-                <option value="" className="bg-gray-800 text-white">Svi statusi</option>
-                <option value="planning" className="bg-gray-800 text-white">Planiranje</option>
-                <option value="active" className="bg-gray-800 text-white">Aktivno</option>
-                <option value="completed" className="bg-gray-800 text-white">Završeno</option>
-                <option value="on-hold" className="bg-gray-800 text-white">Pauzirano</option>
-              </select>
+                              <select
+                  value={filters.status}
+                  onChange={(e) => handleFilterChange('status', e.target.value)}
+                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="" className="bg-white text-gray-900">Svi statusi</option>
+                  <option value="planning" className="bg-white text-gray-900">Planiranje</option>
+                  <option value="active" className="bg-white text-gray-900">Aktivno</option>
+                  <option value="completed" className="bg-white text-gray-900">Završeno</option>
+                  <option value="on-hold" className="bg-white text-gray-900">Pauzirano</option>
+                </select>
             )}
 
-            {}
+            {/* Opseg nivoa za D&D kampanje */}
             {(filters.kategorijaObjave === 'dnd' || filters.kategorijaObjave === '') && (
               <>
                 <input
@@ -224,7 +225,7 @@ const PostsPage = () => {
                   placeholder="Min Level"
                   value={filters.minLevel}
                   onChange={(e) => handleFilterChange('minLevel', e.target.value)}
-                  className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   min="1"
                   max="20"
                 />
@@ -234,7 +235,7 @@ const PostsPage = () => {
                   placeholder="Max Level"
                   value={filters.maxLevel}
                   onChange={(e) => handleFilterChange('maxLevel', e.target.value)}
-                  className="px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   min="1"
                   max="20"
                 />
@@ -244,22 +245,22 @@ const PostsPage = () => {
         </div>
 
         {error && (
-          <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => (
-            <div key={post._id} className="bg-white/10 backdrop-blur-md rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
+            <div key={post._id} className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:border-blue-500 hover:bg-blue-50 transition-all duration-300">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center">
                   {getTypeIcon(post.tip)}
-                  <span className="ml-2 text-sm font-medium text-gray-300">
+                  <span className="ml-2 text-sm font-medium text-gray-600">
                     {getTypeLabel(post.tip)}
                   </span>
                 </div>
-                {}
+                {/* Status badge za D&D kampanje */}
                 {post.status && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) && (
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(post.status)}`}>
                     {getStatusLabel(post.status)}
@@ -267,17 +268,17 @@ const PostsPage = () => {
                 )}
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">
+              <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">
                 {post.naslov}
               </h3>
 
-              <p className="text-gray-300 mb-4 line-clamp-3">
+              <p className="text-gray-600 mb-4 line-clamp-3">
                 {post.tekst}
               </p>
 
-              {}
+              {/* Informacije o nivou i broju igrača */}
               {post.level && post.igraci && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) && (
-                <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                   <span className="flex items-center">
                     <Shield className="w-4 h-4 mr-1" />
                     Nivo {post.level.min}-{post.level.max}
@@ -290,30 +291,30 @@ const PostsPage = () => {
               )}
 
               {post.lokacija && (
-                <div className="flex items-center text-sm text-gray-400 mb-4">
+                <div className="flex items-center text-sm text-gray-500 mb-4">
                   <MapPin className="w-4 h-4 mr-1" />
                   {post.lokacija}
                 </div>
               )}
 
               <div className="flex flex-wrap gap-1 mb-4">
-                {post.kategorije.slice(0, 3).map((kategorija, index) => (
+                {post.kategorije && post.kategorije.slice(0, 3).map((kategorija, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 bg-yellow-500/20 text-yellow-300 text-xs rounded-full"
+                    className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full"
                   >
-                    {kategorija}
+                    {typeof kategorija === 'string' ? kategorija : kategorija.naziv}
                   </span>
                 ))}
-                {post.kategorije.length > 3 && (
-                  <span className="px-2 py-1 bg-gray-500/20 text-gray-300 text-xs rounded-full">
+                {post.kategorije && post.kategorije.length > 3 && (
+                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
                     +{post.kategorije.length - 3}
                   </span>
                 )}
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex items-center text-sm text-gray-400">
+                <div className="flex items-center text-sm text-gray-500">
                   <Calendar className="w-4 h-4 mr-1" />
                   {new Date(post.createdAt).toLocaleDateString('bs-BA')}
                 </div>
@@ -325,8 +326,8 @@ const PostsPage = () => {
                 </Link>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-white/20">
-                <div className="flex items-center text-sm text-gray-400">
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="flex items-center text-sm text-gray-500">
                   <span>
                     {['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) ? 'DM' : 'Autor'}: {post.autor.ime} {post.autor.prezime}
                   </span>
@@ -339,8 +340,8 @@ const PostsPage = () => {
         {posts.length === 0 && !loading && (
           <div className="text-center py-12">
             <Scroll className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-300 text-lg mb-2">Nema objava za prikazati</p>
-            <p className="text-gray-400">Pokušajte s drugim filterima ili pretragom</p>
+            <p className="text-gray-800 text-lg mb-2">Nema objava za prikazati</p>
+            <p className="text-gray-600">Pokušajte s drugim filterima ili pretragom</p>
           </div>
         )}
 
@@ -353,8 +354,8 @@ const PostsPage = () => {
                   onClick={() => fetchPosts(page)}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     page === pagination.currentPage
-                      ? 'bg-yellow-500 text-black'
-                      : 'bg-white/10 text-white hover:bg-white/20'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   {page}

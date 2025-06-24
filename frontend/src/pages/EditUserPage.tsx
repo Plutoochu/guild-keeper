@@ -6,7 +6,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { User, ShieldCheck, Save, Pen, Camera, Trash2, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { profileSchema, ProfileFormData } from '../validators/profileValidator';
+import { profileSchema } from '../validators/profileValidator';
+import { ProfileFormData } from '../types/profileTypes';
 import { User as UserType } from '../types';
 
 const EditUserPage = () => {
@@ -114,11 +115,9 @@ const EditUserPage = () => {
     formData.append('slika', file);
 
     try {
-      const token = localStorage.getItem('token');
       const response = await axios.post(`/users/${targetUser._id}/profile-image`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`
+          'Content-Type': 'multipart/form-data'
         }
       });
 
@@ -141,12 +140,7 @@ const EditUserPage = () => {
 
     setIsUploadingImage(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.delete(`/users/${targetUser._id}/profile-image`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await axios.delete(`/users/${targetUser._id}/profile-image`);
 
       if (response.data.success) {
         setTargetUser(response.data.data);

@@ -21,12 +21,4 @@ export const profileSchema = yup.object().shape({
     .notRequired()
     .nullable()
     .oneOf(['', 'muški', 'ženski', 'ostalo'], 'Spol mora biti: muški, ženski ili ostalo')
-});
-
-export interface ProfileFormData {
-  ime: string;
-  prezime?: string | undefined;
-  email: string;
-  datumRodjenja: string;
-  spol?: 'muški' | 'ženski' | 'ostalo' | undefined;
-} 
+}); 

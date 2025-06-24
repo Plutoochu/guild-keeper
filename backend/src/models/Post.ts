@@ -5,8 +5,8 @@ export interface IPost extends Document {
   tekst: string;
   autor: Schema.Types.ObjectId;
   tip: 'campaign' | 'adventure' | 'tavern-tale' | 'quest' | 'discussion' | 'announcement';
-  kategorije: string[];
-  tagovi: string[];
+  kategorije: Schema.Types.ObjectId[];
+  tagovi: Schema.Types.ObjectId[];
   level?: {
     min: number;
     max: number;
@@ -48,26 +48,14 @@ const PostSchema = new Schema<IPost>({
     default: 'discussion',
     required: true
   },
-  kategorije: {
-    type: [String],
-    default: [],
-    validate: {
-      validator: function(kategorije: string[]) {
-        return kategorije.length <= 5;
-      },
-      message: 'Maksimalno 5 kategorija dozvoljeno'
-    }
-  },
-  tagovi: {
-    type: [String],
-    default: [],
-    validate: {
-      validator: function(tagovi: string[]) {
-        return tagovi.length <= 10;
-      },
-      message: 'Maksimalno 10 tagova dozvoljeno'
-    }
-  },
+  kategorije: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Category'
+  }],
+  tagovi: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Tag'
+  }],
   level: {
     min: {
       type: Number,
@@ -136,6 +124,12 @@ PostSchema.pre(/^find/, function(this: any) {
   this.populate({
     path: 'autor',
     select: 'ime prezime email tip'
+  }).populate({
+    path: 'kategorije',
+    select: 'naziv opis boja ikona'
+  }).populate({
+    path: 'tagovi',
+    select: 'naziv opis boja'
   });
 });
 
