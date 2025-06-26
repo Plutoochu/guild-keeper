@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import Post from '../models/Post';
+import Category from '../models/Category';
+import Tag from '../models/Tag';
 import { AuthRequest } from '../middleware/auth';
 
 
@@ -194,13 +196,50 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
+    let kategorijaIds: string[] = [];
+    let tagIds: string[] = [];
+
+    if (kategorije && kategorije.length > 0) {
+      for (const kategorijaNaziv of kategorije) {
+        let kategorija = await Category.findOne({ naziv: kategorijaNaziv.trim() });
+        
+        if (!kategorija) {
+          kategorija = new Category({
+            naziv: kategorijaNaziv.trim(),
+            boja: '#3B82F6',
+            aktivna: true
+          });
+          await kategorija.save();
+        }
+        
+        kategorijaIds.push(kategorija._id.toString());
+      }
+    }
+
+    if (tagovi && tagovi.length > 0) {
+      for (const tagNaziv of tagovi) {
+        let tag = await Tag.findOne({ naziv: tagNaziv.trim() });
+        
+        if (!tag) {
+          tag = new Tag({
+            naziv: tagNaziv.trim(),
+            boja: '#10B981',
+            aktivna: true
+          });
+          await tag.save();
+        }
+        
+        tagIds.push(tag._id.toString());
+      }
+    }
+
     const newPost = new Post({
       naslov,
       tekst,
       autor: user.id,
       tip: tip || 'discussion',
-      kategorije: kategorije || [],
-      tagovi: tagovi || [],
+      kategorije: kategorijaIds,
+      tagovi: tagIds,
       level: level,
       igraci: igraci,
       lokacija: lokacija,
@@ -262,6 +301,45 @@ export const updatePost = async (req: AuthRequest, res: Response): Promise<void>
 
     const updateData = { ...req.body };
     delete updateData.autor; 
+
+    let kategorijaIds: string[] = [];
+    let tagIds: string[] = [];
+
+    if (updateData.kategorije && updateData.kategorije.length > 0) {
+      for (const kategorijaNaziv of updateData.kategorije) {
+        let kategorija = await Category.findOne({ naziv: kategorijaNaziv.trim() });
+        
+        if (!kategorija) {
+          kategorija = new Category({
+            naziv: kategorijaNaziv.trim(),
+            boja: '#3B82F6',
+            aktivna: true
+          });
+          await kategorija.save();
+        }
+        
+        kategorijaIds.push(kategorija._id.toString());
+      }
+      updateData.kategorije = kategorijaIds;
+    }
+
+    if (updateData.tagovi && updateData.tagovi.length > 0) {
+      for (const tagNaziv of updateData.tagovi) {
+        let tag = await Tag.findOne({ naziv: tagNaziv.trim() });
+        
+        if (!tag) {
+          tag = new Tag({
+            naziv: tagNaziv.trim(),
+            boja: '#10B981',
+            aktivna: true
+          });
+          await tag.save();
+        }
+        
+        tagIds.push(tag._id.toString());
+      }
+      updateData.tagovi = tagIds;
+    }
 
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.id,

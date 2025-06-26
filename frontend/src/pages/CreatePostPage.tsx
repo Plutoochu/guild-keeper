@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -22,10 +22,25 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+interface Category {
+  _id: string;
+  naziv: string;
+  boja: string;
+  ikona: string;
+}
+
+interface Tag {
+  _id: string;
+  naziv: string;
+  boja: string;
+}
+
 const CreatePostPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [formData, setFormData] = useState<CreatePostData>({
     naslov: '',
     tekst: '',
@@ -40,8 +55,30 @@ const CreatePostPage = () => {
     zakljucaniKomentari: false,
     prikvacen: false
   });
-  const [newKategorija, setNewKategorija] = useState('');
-  const [newTag, setNewTag] = useState('');
+
+
+  useEffect(() => {
+    fetchCategoriesAndTags();
+  }, []);
+
+  const fetchCategoriesAndTags = async () => {
+    try {
+      const [categoriesResponse, tagsResponse] = await Promise.all([
+        axios.get('/categories'),
+        axios.get('/tags')
+      ]);
+
+      if (categoriesResponse.data.success) {
+        setAvailableCategories(categoriesResponse.data.data);
+      }
+
+      if (tagsResponse.data.success) {
+        setAvailableTags(tagsResponse.data.data);
+      }
+    } catch (error) {
+      console.error('Greška pri učitavanju kategorija i tagova:', error);
+    }
+  };
 
   if (!user || user.tip !== 'admin') {
     return (
@@ -100,15 +137,16 @@ const CreatePostPage = () => {
     }));
   };
 
-  const addKategorija = () => {
-    if (newKategorija.trim() && !formData.kategorije.includes(newKategorija.trim())) {
+  const addKategorijaFromDropdown = (kategorijaNaziv: string) => {
+    if (kategorijaNaziv && !formData.kategorije.includes(kategorijaNaziv)) {
       setFormData(prev => ({
         ...prev,
-        kategorije: [...prev.kategorije, newKategorija.trim()]
+        kategorije: [...prev.kategorije, kategorijaNaziv]
       }));
-      setNewKategorija('');
     }
   };
+
+
 
   const removeKategorija = (index: number) => {
     setFormData(prev => ({
@@ -117,15 +155,16 @@ const CreatePostPage = () => {
     }));
   };
 
-  const addTag = () => {
-    if (newTag.trim() && !formData.tagovi.includes(newTag.trim())) {
+  const addTagFromDropdown = (tagNaziv: string) => {
+    if (tagNaziv && !formData.tagovi.includes(tagNaziv)) {
       setFormData(prev => ({
         ...prev,
-        tagovi: [...prev.tagovi, newTag.trim()]
+        tagovi: [...prev.tagovi, tagNaziv]
       }));
-      setNewTag('');
     }
   };
+
+
 
   const removeTag = (index: number) => {
     setFormData(prev => ({
@@ -169,6 +208,7 @@ const CreatePostPage = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Tip posta */}
             <div>
               <label className="block text-gray-800 font-medium mb-4 text-lg">
                 Tip posta *
@@ -208,8 +248,10 @@ const CreatePostPage = () => {
               </div>
             </div>
 
+            {/* Glavni sadržaj forme */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
+                {/* Naslov */}
                 <div>
                   <label className="block text-gray-800 font-medium mb-2">
                     Naslov *
@@ -226,6 +268,7 @@ const CreatePostPage = () => {
                   <p className="text-gray-500 text-sm mt-1">{formData.naslov.length}/200 karaktera</p>
                 </div>
 
+                {/* Sadržaj */}
                 <div>
                   <label className="block text-gray-800 font-medium mb-2">
                     Sadržaj *
@@ -242,28 +285,33 @@ const CreatePostPage = () => {
                   <p className="text-gray-500 text-sm mt-1">{formData.tekst.length}/10000 karaktera</p>
                 </div>
 
+                {/* Kategorije */}
                 <div>
                   <label className="block text-gray-800 font-medium mb-2">
                     Kategorije
                   </label>
-                  <div className="flex gap-2 mb-3">
-                    <input
-                      type="text"
-                      value={newKategorija}
-                      onChange={(e) => setNewKategorija(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addKategorija())}
-                      className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Dodaj kategoriju..."
-                      maxLength={30}
-                    />
-                    <button
-                      type="button"
-                      onClick={addKategorija}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
+                  
+                  {availableCategories.length > 0 && (
+                    <div className="mb-3">
+                      <select
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            addKategorijaFromDropdown(e.target.value);
+                            e.target.value = '';
+                          }
+                        }}
+                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Odaberite postojeću kategoriju...</option>
+                        {availableCategories.filter(cat => !formData.kategorije.includes(cat.naziv)).map((category) => (
+                          <option key={category._id} value={category.naziv}>
+                            {category.ikona} {category.naziv}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  
                   <div className="flex flex-wrap gap-2">
                     {formData.kategorije.map((kategorija, index) => (
                       <span key={index} className="inline-flex items-center bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
@@ -280,28 +328,33 @@ const CreatePostPage = () => {
                   </div>
                 </div>
 
+                {/* Tagovi */}
                 <div>
                   <label className="block text-gray-800 font-medium mb-2">
                     Tagovi
                   </label>
-                  <div className="flex gap-2 mb-3">
-                    <input
-                      type="text"
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                      className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Dodaj tag..."
-                      maxLength={20}
-                    />
-                    <button
-                      type="button"
-                      onClick={addTag}
-                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
+                  
+                  {availableTags.length > 0 && (
+                    <div className="mb-3">
+                      <select
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            addTagFromDropdown(e.target.value);
+                            e.target.value = '';
+                          }
+                        }}
+                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Odaberite postojeći tag...</option>
+                        {availableTags.filter(tag => !formData.tagovi.includes(tag.naziv)).map((tag) => (
+                          <option key={tag._id} value={tag.naziv}>
+                            #{tag.naziv}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  
                   <div className="flex flex-wrap gap-2">
                     {formData.tagovi.map((tag, index) => (
                       <span key={index} className="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
@@ -319,6 +372,7 @@ const CreatePostPage = () => {
                 </div>
               </div>
 
+              {/* D&D specifični fields */}
               <div className="space-y-6">
                 {isCampaignType && (
                   <>
@@ -415,6 +469,7 @@ const CreatePostPage = () => {
                   </>
                 )}
 
+                {/* Postavke posta */}
                 <div className="space-y-4">
                   <h3 className="text-gray-800 font-medium text-lg border-b border-gray-200 pb-2">
                     Postavke
@@ -483,6 +538,7 @@ const CreatePostPage = () => {
               </div>
             </div>
 
+            {/* Dugmad za submit */}
             <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
               <button
                 type="button"

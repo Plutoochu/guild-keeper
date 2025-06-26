@@ -166,47 +166,47 @@ const UsersPage = () => {
       <div className="max-w-7xl mx-auto">
         {/* Naslov stranice za upravljanje korisnicima */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            ⚔️ Upravljanje Korisnicima
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            Upravljanje Korisnicima
           </h1>
-          <p className="text-xl text-purple-200">
-            Administracija korisnika - Upravlja svojim carstvom
+          <p className="text-xl text-gray-600">
+            Administracija korisnika - Upravljaj svojim carstvom
           </p>
         </div>
 
         {/* Statistike korisnika */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <div className="text-center">
-              <div className="text-3xl font-bold text-white">{stats.ukupno}</div>
-              <div className="text-purple-200">Ukupno korisnika</div>
+              <div className="text-3xl font-bold text-gray-800">{stats.ukupno}</div>
+              <div className="text-gray-600">Ukupno korisnika</div>
             </div>
           </div>
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-400">{stats.aktivni}</div>
-              <div className="text-purple-200">Aktivni</div>
+              <div className="text-3xl font-bold text-green-600">{stats.aktivni}</div>
+              <div className="text-gray-600">Aktivni</div>
             </div>
           </div>
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-400">{stats.admini}</div>
-              <div className="text-purple-200">Administratori</div>
+              <div className="text-3xl font-bold text-yellow-600">{stats.admini}</div>
+              <div className="text-gray-600">Administratori</div>
             </div>
           </div>
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400">{stats.obicniKorisnici}</div>
-              <div className="text-purple-200">Obični korisnici</div>
+              <div className="text-3xl font-bold text-blue-600">{stats.obicniKorisnici}</div>
+              <div className="text-gray-600">Obični korisnici</div>
             </div>
           </div>
         </div>
 
         {/* Filteri za pretraživanje korisnika */}
-        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 mb-8">
+        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Pretraži
               </label>
               <input
@@ -214,17 +214,17 @@ const UsersPage = () => {
                 value={filters.search || ''}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Ime, prezime ili email..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Tip korisnika
               </label>
               <select
                 value={filters.tip || ''}
                 onChange={(e) => handleFilterChange('tip', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Svi tipovi</option>
                 <option value="admin">Administratori</option>
@@ -232,13 +232,13 @@ const UsersPage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Status
               </label>
               <select
                 value={filters.aktivan?.toString() || ''}
                 onChange={(e) => handleFilterChange('aktivan', e.target.value === '' ? '' : e.target.value === 'true')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Svi statusi</option>
                 <option value="true">Aktivni</option>
@@ -246,13 +246,13 @@ const UsersPage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Sortiraj po
               </label>
               <select
                 value={filters.sortBy || 'createdAt'}
                 onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="createdAt">Datum kreiranja</option>
                 <option value="ime">Ime</option>
@@ -265,9 +265,9 @@ const UsersPage = () => {
 
         {/* Bulk akcije za označene korisnike */}
         {selectedUsers.size > 0 && (
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 mb-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6 shadow-sm">
             <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-white">
+              <span className="text-gray-800">
                 Označeno: {selectedUsers.size} korisnika
               </span>
               <button
@@ -310,19 +310,19 @@ const UsersPage = () => {
         )}
 
         {/* Tabela sa korisnicima */}
-        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
           {loading ? (
             <div className="text-center p-8">
-              <div className="text-white">Učitavanje korisnika...</div>
+              <div className="text-gray-800">Učitavanje korisnika...</div>
             </div>
           ) : error ? (
             <div className="text-center p-8">
-              <div className="text-red-400">{error}</div>
+              <div className="text-red-600">{error}</div>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-white/20">
+                <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left">
                       <input
@@ -332,29 +332,29 @@ const UsersPage = () => {
                         className="w-4 h-4"
                       />
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Korisnik
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Tip
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Kreiran
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Akcije
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/10">
+                <tbody className="divide-y divide-gray-200">
                   {users.map((user) => (
-                    <tr key={user._id} className="hover:bg-white/5">
+                    <tr key={user._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <input
                           type="checkbox"
@@ -374,23 +374,31 @@ const UsersPage = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center">
-                              <span className="text-white font-bold">
-                                {user.ime.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
+                            {user.slika ? (
+                              <img
+                                src={`http://localhost:5000${user.slika}`}
+                                alt={`${user.ime} ${user.prezime}`}
+                                className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
+                              />
+                            ) : (
+                              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
+                                <span className="text-white font-bold">
+                                  {user.ime.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            )}
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-white">
+                            <div className="text-sm font-medium text-gray-900">
                               {user.ime} {user.prezime}
                             </div>
-                            <div className="text-sm text-gray-300">
+                            <div className="text-sm text-gray-500">
                               {user.spol && user.spol}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-white">
+                      <td className="px-6 py-4 text-sm text-gray-900">
                         {user.email}
                       </td>
                       <td className="px-6 py-4">
@@ -411,27 +419,27 @@ const UsersPage = () => {
                           {user.aktivan ? 'Aktivan' : 'Neaktivan'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-300">
+                      <td className="px-6 py-4 text-sm text-gray-500">
                         {formatDate(user.createdAt)}
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex space-x-2">
                           <button
                             onClick={() => navigate(`/users/${user._id}`)}
-                            className="text-blue-400 hover:text-blue-300"
+                            className="text-blue-600 hover:text-blue-500"
                           >
                             👁️
                           </button>
                           <button
                             onClick={() => toggleRole(user._id)}
-                            className="text-purple-400 hover:text-purple-300"
+                            className="text-purple-600 hover:text-purple-500"
                             title="Promijeni ulogu"
                           >
                             ⚡
                           </button>
                           <button
                             onClick={() => toggleStatus(user._id)}
-                            className={user.aktivan ? "text-orange-400 hover:text-orange-300" : "text-green-400 hover:text-green-300"}
+                            className={user.aktivan ? "text-orange-600 hover:text-orange-500" : "text-green-600 hover:text-green-500"}
                             title={user.aktivan ? "Deaktiviraj" : "Aktiviraj"}
                           >
                             {user.aktivan ? '🔒' : '🔓'}
@@ -446,24 +454,23 @@ const UsersPage = () => {
           )}
         </div>
 
-        {}
         {totalPages > 1 && (
           <div className="flex justify-center mt-8">
             <div className="flex space-x-2">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 disabled:opacity-50"
+                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
               >
                 Prethodna
               </button>
-              <span className="px-4 py-2 text-white">
+              <span className="px-4 py-2 text-gray-700">
                 {currentPage} / {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 disabled:opacity-50"
+                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
               >
                 Sljedeća
               </button>

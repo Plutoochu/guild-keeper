@@ -52,7 +52,7 @@ export interface Category {
   naziv: string;
   opis?: string;
   boja: string;
-  ikona: string;
+  ikona?: string;
   aktivna: boolean;
   createdAt: string;
   updatedAt: string;

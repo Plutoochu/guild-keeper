@@ -84,22 +84,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            {!isAuthenticated ? (
-              <div className="hidden md:flex items-center gap-2">
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-sm font-medium text-gray-200 hover:text-yellow-300 transition-colors"
-                >
-                  Prijava
-                </Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2 bg-yellow-500 text-slate-900 text-sm font-medium rounded-md hover:bg-yellow-400 transition-colors"
-                >
-                  Registracija
-                </Link>
-              </div>
-            ) : (
+            {isAuthenticated && (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={toggleProfileDropdown}
@@ -193,16 +178,7 @@ const Navbar = () => {
                     Odjava
                   </button>
                 </>
-              ) : (
-                <>
-                  <NavLink to="/login" onClick={() => setIsMenuOpen(false)}>
-                    Prijava
-                  </NavLink>
-                  <NavLink to="/register" onClick={() => setIsMenuOpen(false)}>
-                    Registracija
-                  </NavLink>
-                </>
-              )}
+              ) : null}
             </nav>
           </div>
         )}

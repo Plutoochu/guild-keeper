@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, User, Settings, BookOpen, LogIn } from 'lucide-react';
+import { Shield, User, Settings, BookOpen, LogIn, Swords } from 'lucide-react';
 
 const HomePage = () => {
   const { user, isAuthenticated, isAdmin } = useAuth();
@@ -10,8 +10,8 @@ const HomePage = () => {
     return (
       <div className="container mx-auto py-12 px-6">
         <div className="text-center mb-12">
-          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Shield className="h-8 w-8 text-white" />
+          <div className="w-16 h-16 bg-yellow-500 rounded-lg flex items-center justify-center mx-auto mb-6">
+            <Swords className="h-8 w-8 text-slate-900" />
           </div>
           <h1 className="text-4xl font-bold mb-4 text-gray-900">
             Dobrodošli u GuildKeeper

@@ -10,50 +10,37 @@ const dndCategories = [
   {
     naziv: 'Kampanje',
     opis: 'Dugotrajne D&D kampanje sa više sesija',
-    boja: '#8B5CF6',
-    ikona: '🏰'
+    boja: '#8B5CF6'
   },
   {
     naziv: 'One-Shots',
     opis: 'Kratke avanture koje se završavaju u jednoj sesiji',
-    boja: '#10B981',
-    ikona: '⚔️'
+    boja: '#10B981'
   },
   {
     naziv: 'Homebrew',
     opis: 'Prilagođeni sadržaj kreiran od strane zajednice',
-    boja: '#F59E0B',
-    ikona: '🔮'
+    boja: '#F59E0B'
   },
   {
     naziv: 'Oficijalni Moduli',
     opis: 'Oficijalni D&D moduli i avanture',
-    boja: '#EF4444',
-    ikona: '📚'
+    boja: '#EF4444'
   },
   {
     naziv: 'Karakteri',
     opis: 'Kreiranje i razvoj karaktera',
-    boja: '#3B82F6',
-    ikona: '🎭'
-  },
-  {
-    naziv: 'Világovi',
-    opis: 'Izgradnja i razvoj fantasy światova',
-    boja: '#8B5CF6',
-    ikona: '🌍'
+    boja: '#3B82F6'
   },
   {
     naziv: 'Pravila',
     opis: 'Diskusije o pravilima i mehanikama',
-    boja: '#6B7280',
-    ikona: '⚖️'
+    boja: '#6B7280'
   },
   {
     naziv: 'Resursi',
     opis: 'Korisni resursi za DM-ove i igrače',
-    boja: '#06B6D4',
-    ikona: '📖'
+    boja: '#06B6D4'
   }
 ];
 

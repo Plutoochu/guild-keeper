@@ -5,7 +5,7 @@ export interface ICategory extends Document {
   naziv: string;
   opis?: string;
   boja: string;
-  ikona: string;
+  ikona?: string;
   aktivna: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -32,7 +32,6 @@ const categorySchema: Schema = new Schema({
   },
   ikona: {
     type: String,
-    required: [true, 'Ikona kategorije je obavezna'],
     trim: true
   },
   aktivna: {

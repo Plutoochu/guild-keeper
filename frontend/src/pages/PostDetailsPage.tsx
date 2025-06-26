@@ -107,11 +107,11 @@ const PostDetailsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 py-8">
+      <div className="min-h-screen bg-white py-8">
         <div className="container mx-auto px-6">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-            <p className="text-white">Učitava se objava...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-800">Učitava se objava...</p>
           </div>
         </div>
       </div>
@@ -120,15 +120,15 @@ const PostDetailsPage = () => {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 py-8">
+      <div className="min-h-screen bg-white py-8">
         <div className="container mx-auto px-6">
           <div className="text-center">
             <Scroll className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-300 text-lg mb-2">Objava nije pronađena</p>
-            <p className="text-gray-400 mb-6">{error}</p>
+            <p className="text-gray-800 text-lg mb-2">Objava nije pronađena</p>
+            <p className="text-gray-600 mb-6">{error}</p>
             <Link
               to="/posts"
-              className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-lg font-semibold transition-colors"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
               Nazad na objave
             </Link>
@@ -139,26 +139,26 @@ const PostDetailsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="container mx-auto px-6">
         <div className="mb-6">
           <Link
             to="/posts"
-            className="inline-flex items-center text-yellow-400 hover:text-yellow-300 transition-colors"
+            className="inline-flex items-center text-blue-600 hover:text-blue-700 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Nazad na objave
           </Link>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           <div className="p-8">
             <div className="flex items-start justify-between mb-6">
               <div className="flex items-center">
                 {getTypeIcon(post.tip)}
                 <div className="ml-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-gray-300 font-medium">
+                    <span className="text-gray-600 font-medium">
                       {getTypeLabel(post.tip)}
                     </span>
                     {post.status && (
@@ -167,7 +167,7 @@ const PostDetailsPage = () => {
                       </span>
                     )}
                   </div>
-                  <h1 className="text-4xl font-bold text-white">
+                  <h1 className="text-4xl font-bold text-gray-800">
                     {post.naslov}
                   </h1>
                 </div>
@@ -195,23 +195,23 @@ const PostDetailsPage = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
-                <div className="bg-white/5 rounded-lg p-6 mb-6">
-                  <h2 className="text-xl font-semibold text-white mb-4">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-4">
                     {post.level && post.igraci && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) ? 'Opis kampanje' : 'Sadržaj objave'}
                   </h2>
-                  <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                  <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                     {post.tekst}
                   </div>
                 </div>
 
                 {post.kategorije && post.kategorije.length > 0 && (
-                  <div className="bg-white/5 rounded-lg p-6 mb-6">
-                    <h3 className="text-lg font-semibold text-white mb-4">Kategorije</h3>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Kategorije</h3>
                     <div className="flex flex-wrap gap-2">
                       {post.kategorije.map((kategorija, index) => (
                         <span
                           key={index}
-                          className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-sm"
+                          className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm"
                         >
                           {typeof kategorija === 'string' ? kategorija : kategorija.naziv}
                         </span>
@@ -221,13 +221,13 @@ const PostDetailsPage = () => {
                 )}
 
                 {post.tagovi && post.tagovi.length > 0 && (
-                  <div className="bg-white/5 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-white mb-4">Tagovi</h3>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Tagovi</h3>
                     <div className="flex flex-wrap gap-2">
                       {post.tagovi.map((tag, index) => (
                         <span
                           key={index}
-                          className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm"
+                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
                         >
                           #{typeof tag === 'string' ? tag : tag.naziv}
                         </span>
@@ -238,29 +238,29 @@ const PostDetailsPage = () => {
               </div>
 
               <div className="space-y-6">
-                <div className="bg-white/5 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                     <User className="w-5 h-5 mr-2" />
                     {post.level && post.igraci && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) ? 'Dungeon Master' : 'Autor'}
                   </h3>
-                  <div className="text-gray-300">
+                  <div className="text-gray-700">
                     <p className="font-medium">{post.autor.ime} {post.autor.prezime}</p>
-                    <p className="text-sm text-gray-400">{post.autor.email}</p>
+                    <p className="text-sm text-gray-600">{post.autor.email}</p>
                   </div>
                 </div>
 
-                <div className="bg-white/5 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-white mb-4">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
                     {post.level && post.igraci && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) ? 'Detalji kampanje' : 'Detalji objave'}
                   </h3>
                   <div className="space-y-4">
                     {post.level && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) && (
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-400 flex items-center">
+                        <span className="text-gray-600 flex items-center">
                           <Shield className="w-4 h-4 mr-2" />
                           Nivo
                         </span>
-                        <span className="text-white font-medium">
+                        <span className="text-gray-800 font-medium">
                           {post.level.min} - {post.level.max}
                         </span>
                       </div>
@@ -268,11 +268,11 @@ const PostDetailsPage = () => {
 
                     {post.igraci && ['campaign', 'adventure', 'tavern-tale', 'quest'].includes(post.tip) && (
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-400 flex items-center">
+                        <span className="text-gray-600 flex items-center">
                           <Users className="w-4 h-4 mr-2" />
                           Igrači
                         </span>
-                        <span className="text-white font-medium">
+                        <span className="text-gray-800 font-medium">
                           {post.igraci.min} - {post.igraci.max}
                         </span>
                       </div>
@@ -280,32 +280,32 @@ const PostDetailsPage = () => {
 
                     {post.lokacija && (
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-400 flex items-center">
+                        <span className="text-gray-600 flex items-center">
                           <MapPin className="w-4 h-4 mr-2" />
                           Lokacija
                         </span>
-                        <span className="text-white font-medium">
+                        <span className="text-gray-800 font-medium">
                           {post.lokacija}
                         </span>
                       </div>
                     )}
 
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-400 flex items-center">
+                      <span className="text-gray-600 flex items-center">
                         <Calendar className="w-4 h-4 mr-2" />
                         Kreirana
                       </span>
-                      <span className="text-white font-medium">
+                      <span className="text-gray-800 font-medium">
                         {new Date(post.createdAt).toLocaleDateString('bs-BA')}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-400">Javna</span>
+                      <span className="text-gray-600">Javna</span>
                       <span className={`px-2 py-1 rounded text-sm ${
                         post.javno 
-                          ? 'bg-green-500/20 text-green-300' 
-                          : 'bg-red-500/20 text-red-300'
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
                       }`}>
                         {post.javno ? 'Da' : 'Ne'}
                       </span>
